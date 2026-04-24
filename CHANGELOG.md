@@ -5,8 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
 ## [0.1.0] — 2026-04-24
 
 ### Added
@@ -32,6 +30,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Copy-code button island, Pagefind search UI island, TOC scroll-spy island
 - `public/favicon.svg`, `public/favicon.ico`, `public/apple-touch-icon.png`, `public/site.webmanifest`
 - `twitter:creator` meta tag derived from `SOCIALS`
-
-[Unreleased]: https://github.com/vstorm-co/astro-blog/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/vstorm-co/astro-blog/releases/tag/v0.1.0
