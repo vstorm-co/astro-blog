@@ -21,13 +21,13 @@ Built on <b>Astro 6 + Tailwind CSS 4</b>, zero JS on reading pages, 100 Lighthou
   </a>
 </p>
 
-<p align="center">
-  <img src="./assets/hero_dark.png" alt="astro-blog — dark mode" width="430">
-  <img src="./assets/hero_light.png" alt="astro-blog — light mode" width="430">
-</p>
+<table width="100%"><tr>
+  <td width="50%"><img src="./assets/hero_dark.png" alt="Dark mode" width="100%"></td>
+  <td width="50%"><img src="./assets/hero_light.png" alt="Light mode" width="100%"></td>
+</tr></table>
 
 <p align="center">
-  <img src="./assets/admin_panel.png" alt="astro-blog — admin panel" width="880">
+  <img src="./assets/admin_panel.png" alt="astro-blog — admin panel" width="100%">
 </p>
 
 ---
