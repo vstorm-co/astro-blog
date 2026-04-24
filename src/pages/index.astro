@@ -1,0 +1,27 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Hero from "@/components/home/Hero.astro";
+import LatestPosts from "@/components/home/LatestPosts.astro";
+import FeaturedStrip from "@/components/home/FeaturedStrip.astro";
+import { getAllPosts, getFeaturedPosts } from "@/lib/posts";
+import { SITE } from "@/site.config";
+
+const all = await getAllPosts();
+const featured = await getFeaturedPosts();
+const latest = all
+  .filter((p) => !featured.find((f) => f.id === p.id))
+  .slice(0, SITE.postsOnHome);
+---
+<BaseLayout title={SITE.title} description={SITE.description}>
+  <Hero />
+  <div class="container home-body">
+    <FeaturedStrip posts={featured} />
+    <LatestPosts posts={latest} />
+  </div>
+</BaseLayout>
+
+<style>
+  .home-body {
+    padding-bottom: 5rem;
+  }
+</style>

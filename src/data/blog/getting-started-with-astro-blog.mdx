@@ -1,0 +1,125 @@
+---
+title: Getting Started with astro-blog
+description: >-
+  Everything you need to go from zero to a live blog — clone, configure, and
+  deploy in under 15 minutes.
+pubDate: 2026-04-24
+author: Jane Doe
+tags:
+  - meta
+  - guide
+featured: true
+heroImage: /images/blog/getting-started-with-astro-blog/hero.webp
+---
+
+import Callout from "@/components/blog/Callout.astro";
+import Steps from "@/components/blog/Steps.astro";
+import FileTree from "@/components/blog/FileTree.astro";
+import Figure from "@/components/blog/Figure.astro";
+import InfoCard from "@/components/blog/InfoCard.astro";
+import TwoColumn from "@/components/blog/TwoColumn.astro";
+
+This template gives you a fully-featured MDX blog with a built-in admin panel, syntax highlighting, dark/light mode, and Vercel deployment — all pre-wired. Delete this post when you're done reading it.
+
+## Prerequisites
+
+You'll need [Bun](https://bun.sh) installed (or Node 20+ with npm). That's it.
+
+## Installation
+
+<Steps items={[
+  { title: "Clone the repository", body: "git clone https://github.com/your-username/astro-blog.git && cd astro-blog" },
+  { title: "Install dependencies", body: "bun install" },
+  { title: "Start the dev server", body: "bun run dev — then open http://localhost:4321" },
+]} />
+
+<Figure src="/images/blog/getting-started-with-astro-blog/dev-server.webp" alt="The blog running locally on port 4321" caption="The site running locally on port 4321." />
+
+## Configure your site
+
+All site-wide settings live in a single file. Open `src/site.config.ts` and update the identity block:
+
+```ts
+export const SITE = {
+  website: "https://yourdomain.com",
+  title: "Your Blog Name",
+  author: "Your Name",
+  description: "One-line description of your blog.",
+  // ...
+};
+```
+
+<FileTree items={[
+  { label: "src", children: [
+    { label: "site.config.ts", note: "← start here" },
+    { label: "data", children: [
+      { label: "blog", children: [{ label: "your-posts.mdx" }] },
+    ]},
+    { label: "components", children: [
+      { label: "blog", note: "custom MDX components" },
+    ]},
+  ]},
+  { label: "public", children: [
+    { label: "images", note: "static assets" },
+    { label: "favicon.svg" },
+  ]},
+]} />
+
+<Callout type="info" title="One file to rule them all">
+  `site.config.ts` is the only file you need to touch for basic customisation — name, description, nav links, accent colour, and feature flags are all there.
+</Callout>
+
+## Customise navigation
+
+The nav links are an array in `site.config.ts`. Each item needs a `label` and an `href`:
+
+```ts
+nav: [
+  { label: "Blog", href: "/posts/" },
+  { label: "Tags", href: "/tags/" },
+  { label: "About", href: "/about/" },
+],
+```
+
+Add, remove, or rename as needed. The About page lives at `src/data/pages/about.md` — edit it directly.
+
+## Light and dark mode
+
+The theme toggle is included by default. You can disable it by setting `lightAndDarkMode: false` in `site.config.ts`. The chosen theme is stored in `localStorage` and persists across visits.
+
+<TwoColumn leftTitle="Dark mode" rightTitle="Light mode">
+  <Fragment slot="left">
+    Default. All CSS custom properties are tuned for dark backgrounds with good contrast.
+  </Fragment>
+  <Fragment slot="right">
+    Override with `data-theme="light"` on `<html>`. The inline script in `BaseLayout.astro` handles this before first paint.
+  </Fragment>
+</TwoColumn>
+
+## Deploy to Vercel
+
+<Steps items={[
+  { title: "Push to GitHub", body: "git add . && git commit -m 'initial' && git push" },
+  { title: "Import on Vercel", body: "Go to vercel.com/new, import your repo, and click Deploy. No configuration needed — the build command and output directory are detected automatically." },
+  { title: "Set your domain", body: "Add a custom domain in Vercel's project settings, then update SITE.website in site.config.ts to match." },
+]} />
+
+<Figure src="/images/blog/getting-started-with-astro-blog/vercel-deploy.webp" alt="Vercel deployment screen showing Astro detected automatically" caption="Vercel detects Astro automatically — no build config needed." />
+
+<Callout type="success" title="You're live">
+  Once deployed, update `SITE.website` in `site.config.ts` to your production URL. This is used for the sitemap, OG tags, and canonical URLs.
+</Callout>
+
+## What's next
+
+<InfoCard title="Write your first post" icon="✍️" href="/posts/writing-posts/">
+  Learn how to write blog posts in MDX — frontmatter fields, markdown, and custom components.
+</InfoCard>
+
+<InfoCard title="Use the admin panel" icon="🛠" href="/posts/admin-panel/">
+  Create and edit posts visually without touching the filesystem directly.
+</InfoCard>
+
+<InfoCard title="Browse all components" icon="🧩" href="/posts/components-reference/">
+  See every custom MDX component available in this template with live examples.
+</InfoCard>

@@ -1,0 +1,128 @@
+---
+import type { Post } from "@/lib/posts";
+import Datetime from "@/components/post/Datetime.astro";
+import { readingTimeMinutes } from "@/lib/posts";
+
+export interface Props {
+  posts: Post[];
+}
+const { posts } = Astro.props;
+const first = posts[0];
+---
+{first && (
+  <section class="featured">
+    <a href={`/posts/${first.id}/`} class="featured-link">
+      <div class="featured-body">
+        <div class="featured-head">
+          <span class="eyebrow">Featured</span>
+          <span class="featured-meta">
+            <Datetime date={first.data.pubDate} />
+            <span aria-hidden>·</span>
+            <span>{readingTimeMinutes(first.body)} min</span>
+          </span>
+        </div>
+        <h2 class="featured-title">{first.data.title}</h2>
+        <p class="featured-desc">{first.data.description}</p>
+        <span class="featured-cta">
+          Read post
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+            <path d="M5 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+      {first.data.heroImage && (
+        <div class="featured-img-wrap">
+          <img
+            src={first.data.heroImage}
+            alt={first.data.title}
+            class="featured-img"
+            loading="eager"
+            decoding="async"
+          />
+        </div>
+      )}
+    </a>
+  </section>
+)}
+
+<style>
+  .featured {
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .featured-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2.5rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .featured-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .featured-img-wrap {
+    flex-shrink: 0;
+    width: 340px;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+  .featured-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .featured-link:hover .featured-img { transform: scale(1.03); }
+  .featured-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+  }
+  .featured-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .featured-title {
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+    line-height: 1.15;
+    letter-spacing: -0.028em;
+    margin: 0;
+    font-weight: 600;
+    color: var(--color-text);
+    max-width: 28ch;
+    transition: color 0.15s;
+  }
+  .featured-link:hover .featured-title { color: var(--color-accent); }
+  .featured-desc {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+    max-width: 60ch;
+  }
+  .featured-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--color-accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+  .featured-link:hover .featured-cta svg { transform: translateX(3px); }
+  .featured-cta svg { transition: transform 0.15s; }
+  @media (max-width: 700px) {
+    .featured-link { flex-direction: column; gap: 1.25rem; }
+    .featured-img-wrap { width: 100%; }
+  }
+</style>

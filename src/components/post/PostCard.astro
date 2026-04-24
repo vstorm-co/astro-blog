@@ -1,0 +1,413 @@
+---
+import type { Post } from "@/lib/posts";
+import { Image } from "astro:assets";
+import Datetime from "./Datetime.astro";
+import TagChip from "./TagChip.astro";
+import { readingTimeMinutes } from "@/lib/posts";
+
+export interface Props {
+  post: Post;
+  variant?: "default" | "row" | "compact" | "grid";
+}
+
+const { post, variant = "default" } = Astro.props;
+const href = `/posts/${post.id}/`;
+const reading = readingTimeMinutes(post.body);
+const cover = post.data.cover;
+const heroImage = post.data.heroImage;
+const coverAlt = post.data.coverAlt ?? post.data.title;
+---
+
+{variant === "row" ? (
+  <a class="row" href={href}>
+    <div class="row-date">
+      <Datetime date={post.data.pubDate} />
+    </div>
+    <div class="row-body">
+      <h3 class="row-title">{post.data.title}</h3>
+      <p class="row-desc">{post.data.description}</p>
+    </div>
+    <div class="row-meta">
+      <span class="row-author">{post.data.author}</span>
+      <span class="row-reading">{reading} min</span>
+    </div>
+  </a>
+) : variant === "compact" ? (
+  <a class="compact" href={href}>
+    <Datetime date={post.data.pubDate} class="compact-date" />
+    <span class="compact-title">{post.data.title}</span>
+  </a>
+) : variant === "grid" ? (
+  <a class="grid-card" href={href}>
+    <div class="grid-cover">
+      {cover ? (
+        <Image
+          src={cover}
+          alt={coverAlt}
+          width={600}
+          height={340}
+          class="grid-cover-img"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : heroImage ? (
+        <img
+          src={heroImage}
+          alt={coverAlt}
+          class="grid-cover-img"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <div class="grid-cover-placeholder" aria-hidden>
+          <div class="grid-cover-lines">
+            <span style="width:65%"></span>
+            <span style="width:88%"></span>
+            <span style="width:72%"></span>
+            <span style="width:50%"></span>
+            <span style="width:80%"></span>
+            <span style="width:40%"></span>
+          </div>
+        </div>
+      )}
+    </div>
+    <div class="grid-body">
+      {post.data.tags.length > 0 && (
+        <div class="grid-tags">
+          {post.data.tags.slice(0, 2).map((t) => (
+            <span class="grid-tag">#{t}</span>
+          ))}
+        </div>
+      )}
+      <h3 class="grid-title">{post.data.title}</h3>
+      <p class="grid-desc">{post.data.description}</p>
+      <div class="grid-meta">
+        <Datetime date={post.data.pubDate} />
+        <span aria-hidden>·</span>
+        <span>{post.data.author}</span>
+        <span aria-hidden>·</span>
+        <span>{reading} min read</span>
+      </div>
+    </div>
+  </a>
+) : (
+  /* default card */
+  <article class="card">
+    {(cover || heroImage) && (
+      <a href={href} class="card-cover-link" tabindex="-1" aria-hidden>
+        {cover ? (
+          <Image
+            src={cover}
+            alt={coverAlt}
+            width={600}
+            height={300}
+            class="card-cover-img"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <img
+            src={heroImage}
+            alt={coverAlt}
+            class="card-cover-img"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+      </a>
+    )}
+    <a class="card-link" href={href}>
+      <div class="card-head">
+        <Datetime date={post.data.pubDate} />
+        <span aria-hidden>·</span>
+        <span>{post.data.author}</span>
+        <span aria-hidden>·</span>
+        <span>{reading} min</span>
+      </div>
+      <h3 class="card-title">{post.data.title}</h3>
+      <p class="card-desc">{post.data.description}</p>
+    </a>
+    {post.data.tags.length > 0 && (
+      <div class="card-tags">
+        {post.data.tags.slice(0, 3).map((t) => <TagChip tag={t} />)}
+      </div>
+    )}
+  </article>
+)}
+
+<style>
+  /* ---- row ---- */
+  .row {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.15s;
+  }
+  .row:hover .row-title { color: var(--color-accent); }
+  .row-date {
+    font-size: 0.82rem;
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .row-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  .row-title {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+    margin: 0;
+    color: var(--color-text);
+    transition: color 0.15s;
+  }
+  .row-desc {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .row-meta {
+    color: var(--color-text-tertiary);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+  }
+  .row-author { color: var(--color-text-tertiary); }
+  @media (max-width: 640px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+      padding: 1rem 0;
+    }
+    .row-meta { display: none; }
+    .row-date { font-size: 0.78rem; }
+  }
+
+  /* ---- compact ---- */
+  .compact {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.55rem 0;
+    text-decoration: none;
+    color: var(--color-text);
+    font-size: 0.95rem;
+    transition: color 0.15s;
+  }
+  .compact:hover { color: var(--color-accent); }
+  .compact-date {
+    color: var(--color-text-tertiary);
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .compact-title { flex: 1; }
+
+  /* ---- grid card ---- */
+  .grid-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: all 0.15s;
+  }
+  .grid-card:hover {
+    border-color: var(--color-border-hover);
+    transform: translateY(-2px);
+  }
+  .grid-card:hover .grid-title { color: var(--color-accent); }
+
+  .grid-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-surface-hover);
+    position: relative;
+  }
+  .grid-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  .grid-card:hover .grid-cover-img { transform: scale(1.03); }
+
+  .grid-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 1.75rem;
+    background: var(--color-surface-hover);
+    position: relative;
+    overflow: hidden;
+  }
+  .grid-cover-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--color-accent);
+    opacity: 0.5;
+  }
+  .grid-cover-placeholder::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; right: -20px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  }
+  .grid-cover-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    width: 100%;
+  }
+  .grid-cover-lines span {
+    display: block;
+    height: 7px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--color-text-tertiary) 18%, var(--color-surface-hover));
+  }
+  .grid-cover-lines span:first-child {
+    height: 11px;
+    margin-bottom: 3px;
+    background: color-mix(in srgb, var(--color-text-secondary) 22%, var(--color-surface-hover));
+  }
+
+  .grid-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.1rem;
+    flex: 1;
+  }
+  .grid-tags {
+    display: flex;
+    gap: 0.4rem;
+  }
+  .grid-tag {
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+  .grid-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 0;
+    color: var(--color-text);
+    letter-spacing: -0.015em;
+    transition: color 0.15s;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .grid-desc {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .grid-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--color-text-tertiary);
+    margin-top: auto;
+    padding-top: 0.4rem;
+  }
+
+  /* ---- default card ---- */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--color-border-hover); }
+  .card-cover-link { display: block; overflow: hidden; }
+  .card-cover-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  .card:hover .card-cover-img { transform: scale(1.03); }
+  .card-link {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 1.25rem;
+    padding-top: 0;
+  }
+  .card:not(:has(.card-cover-img)) .card-link { padding-top: 1.25rem; }
+  .card-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-text-tertiary);
+    font-size: 0.8rem;
+    padding-top: 1.25rem;
+  }
+  .card:has(.card-cover-img) .card-head { padding-top: 0.75rem; }
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    margin: 0;
+  }
+  .card:hover .card-title { color: var(--color-accent); }
+  .card-desc {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding: 0 1.25rem 1.25rem;
+  }
+</style>

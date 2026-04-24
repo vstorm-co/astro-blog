@@ -1,0 +1,95 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PostCard from "@/components/post/PostCard.astro";
+import { getAllPosts } from "@/lib/posts";
+import { SITE } from "@/site.config";
+
+if (!SITE.features.archive) {
+  return Astro.redirect("/posts/");
+}
+
+const posts = await getAllPosts();
+
+const byYear = new Map<number, typeof posts>();
+for (const p of posts) {
+  const y = p.data.pubDate.getFullYear();
+  const list = byYear.get(y) ?? [];
+  list.push(p);
+  byYear.set(y, list);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+<BaseLayout title="Archive" description={`Full archive of posts on ${SITE.title}`}>
+  <div class="container archive">
+    <header class="archive-header">
+      <p class="eyebrow">Archive</p>
+      <h1>Everything ever written</h1>
+      <p class="archive-sub">{posts.length} {posts.length === 1 ? "post" : "posts"} across {years.length} {years.length === 1 ? "year" : "years"}.</p>
+    </header>
+    {years.map((y) => {
+      const list = byYear.get(y) ?? [];
+      return (
+        <section class="archive-year">
+          <div class="archive-year-head">
+            <h2>{y}</h2>
+            <span class="archive-year-count">{list.length}</span>
+            <span class="archive-year-line" aria-hidden />
+          </div>
+          <div class="archive-list">
+            {list.map((p) => <PostCard post={p} variant="compact" />)}
+          </div>
+        </section>
+      );
+    })}
+  </div>
+</BaseLayout>
+
+<style>
+  .archive {
+    padding: 3rem 1.5rem 5rem;
+  }
+  .archive-header {
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .archive-header h1 {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    letter-spacing: -0.025em;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.05;
+  }
+  .archive-sub {
+    margin: 0;
+    color: var(--color-text-tertiary);
+    font-size: 0.925rem;
+  }
+  .archive-year { margin-top: 2.5rem; }
+  .archive-year-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .archive-year h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .archive-year-count {
+    font-size: 0.72rem;
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+  }
+  .archive-year-line {
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+  }
+  .archive-list { display: flex; flex-direction: column; }
+</style>

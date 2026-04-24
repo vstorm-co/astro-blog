@@ -1,0 +1,56 @@
+name: 🐛 Bug report
+description: Something misbehaves in the template
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. The clearer the reproduction, the faster we can fix it.
+  - type: input
+    id: version
+    attributes:
+      label: Template version or commit
+      placeholder: "v0.3.2 or a5f8c1e"
+    validations: { required: true }
+  - type: dropdown
+    id: host
+    attributes:
+      label: Where does this reproduce?
+      options:
+        - Local dev (bun run dev)
+        - Vercel
+        - Netlify
+        - Cloudflare Pages
+        - GitHub Pages
+        - Other / self-hosted
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations: { required: true }
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Minimal steps or a link to a fork where the bug reproduces.
+    validations: { required: true }
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      render: bash
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I reproduced this on a clean clone.
+          required: false

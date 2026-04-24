@@ -1,0 +1,62 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import type { JsonLd } from "@/lib/schemas";
+import "@/styles/prose.css";
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalURL?: string;
+  ogImage?: string;
+  schemas?: JsonLd[];
+  eyebrow?: string;
+}
+
+const { eyebrow = "Page", ...props } = Astro.props;
+---
+<BaseLayout {...props}>
+  <header class="page-hero">
+    <div class="container page-hero-inner">
+      <p class="eyebrow">{eyebrow}</p>
+      <h1 class="page-title">{props.title}</h1>
+      {props.description && <p class="page-sub">{props.description}</p>}
+    </div>
+  </header>
+  <div class="container page-body">
+    <article class="prose">
+      <slot />
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: 4rem 0 3rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .page-hero-inner {
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 42rem;
+  }
+  .page-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.028em;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.05;
+  }
+  .page-sub {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+  .page-body {
+    padding: 3rem 1.5rem 5rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+</style>

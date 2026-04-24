@@ -1,0 +1,195 @@
+---
+title: Writing Blog Posts with MDX
+description: How to write posts using frontmatter, markdown, and custom Astro components — with real examples for every field.
+pubDate: 2026-04-24
+author: Jane Doe
+tags:
+  - meta
+  - guide
+  - mdx
+heroImage: /images/blog/writing-posts/hero.webp
+---
+
+import Callout from "@/components/blog/Callout.astro";
+import Steps from "@/components/blog/Steps.astro";
+import FileTree from "@/components/blog/FileTree.astro";
+import Figure from "@/components/blog/Figure.astro";
+import Details from "@/components/blog/Details.astro";
+import Badge from "@/components/blog/Badge.astro";
+import Kbd from "@/components/blog/Kbd.astro";
+
+Every blog post is an `.mdx` file inside `src/data/blog/`. MDX is Markdown with the ability to import and use Astro (or React) components directly in your prose. You get the simplicity of Markdown with the flexibility of components when you need them.
+
+## Creating a new post
+
+The fastest way is the admin panel at [http://localhost:4321/admin/](http://localhost:4321/admin/). Click **+ New**, enter a title, and the slug is auto-generated. You'll land straight in the editor.
+
+Alternatively, create a file manually:
+
+```bash
+touch src/data/blog/my-new-post.mdx
+```
+
+<Callout type="info" title="Slug = filename">
+  The filename (without `.mdx`) becomes the URL slug. `my-new-post.mdx` → `/posts/my-new-post/`. Keep slugs lowercase, hyphen-separated, and descriptive.
+</Callout>
+
+## Frontmatter
+
+Every post starts with a YAML frontmatter block between `---` delimiters:
+
+```yaml
+---
+title: My Post Title
+description: One or two sentences shown in search results and post cards.
+pubDate: 2026-04-24
+updatedDate: 2026-05-01
+author: Jane Doe
+tags:
+  - tutorial
+  - web
+heroImage: /images/blog/my-post/hero.webp
+draft: false
+featured: false
+---
+```
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `title` | ✓ | Max 60 chars for good SEO |
+| `description` | — | Max 160 chars, shown in cards and search |
+| `pubDate` | ✓ | `YYYY-MM-DD` format |
+| `updatedDate` | — | Shows "Updated" label in the layout |
+| `author` | — | Defaults to `SITE.author` from config |
+| `tags` | — | Array of strings, used for tag pages |
+| `heroImage` | — | Path to cover image (shown in cards and post header) |
+| `draft` | — | `true` hides the post from production builds |
+| `featured` | — | `true` shows the post in the featured strip on the home page |
+
+## Markdown basics
+
+Standard CommonMark markdown works everywhere:
+
+```md
+## Heading level 2
+
+Regular paragraph with **bold**, _italic_, and `inline code`.
+
+- Bullet list
+- Another item
+
+1. Numbered list
+2. Second item
+
+> Blockquote for longer citations.
+
+[Link text](https://example.com)
+
+![Image alt text](/images/my-image.png)
+```
+
+<Callout type="warn" title="Use H2 and below">
+  The post title is rendered as `<h1>` by the layout. Start your headings at `##` to maintain the correct document outline.
+</Callout>
+
+## Code blocks
+
+Wrap code in triple backticks with a language identifier. Syntax highlighting is handled by [Expressive Code](https://expressive-code.com/) with a Shiki backend:
+
+````md
+```ts
+function greet(name: string): string {
+  return `Hello, ${name}`;
+}
+```
+````
+
+Supported features: line numbers, diff highlighting, titles, and more — see the Expressive Code docs.
+
+## Importing custom components
+
+After the frontmatter, import any component you want to use:
+
+```mdx
+import Callout from "@/components/blog/Callout.astro";
+import Steps from "@/components/blog/Steps.astro";
+
+<Callout type="success" title="Works!">
+  This is a custom component inside MDX.
+</Callout>
+```
+
+All available components are documented in the [Component Reference](/posts/components-reference/) post.
+
+## Images
+
+Put images in `public/images/blog/your-slug/` and reference them with a root-relative path:
+
+```mdx
+import Figure from "@/components/blog/Figure.astro";
+
+<Figure
+  src="/images/blog/my-post/screenshot.webp"
+  alt="Descriptive alt text"
+  caption="Optional caption shown below the image."
+/>
+```
+
+{/* TODO: Add screenshot showing image in a post */}
+<Figure src="/images/blog/writing-posts/figure-example.webp" alt="TODO: screenshot of a Figure component rendered in a blog post" caption="The Figure component renders a bordered image with an optional caption." />
+
+<Callout type="info" title="Alt text matters">
+  Always write descriptive `alt` text. It's read by screen readers and displayed when images fail to load.
+</Callout>
+
+## Keyboard shortcuts in the editor
+
+When writing in the admin panel:
+
+- <Kbd>⌘</Kbd> + <Kbd>S</Kbd> — save (autosave also runs after 900ms of inactivity)
+- Switch to the **Frontmatter** tab to edit metadata without touching YAML by hand
+- The **Components** tab in the right panel shows a searchable list with insert snippets
+- The **Images** tab lets you upload and copy image URLs directly
+
+## Drafts and scheduling
+
+Set `draft: true` to hide a post from production. It still appears in the admin panel and in `bun run dev`. 
+
+To schedule a post, set `pubDate` to a future date — it will be hidden until that date is reached (within the grace window configured in `site.config.ts`).
+
+<Details summary="How the grace window works">
+  `scheduledPostGraceMs` in `site.config.ts` defaults to 0. If you set it to `3600000` (1 hour), posts will appear up to 1 hour before their `pubDate`. Useful for deployment lag.
+</Details>
+
+## Tags
+
+Tags are free-form strings. They generate tag pages at `/tags/your-tag/` automatically. Use consistent, lowercase, hyphenated slugs:
+
+```yaml
+tags:
+  - web-development
+  - typescript
+  - tutorial
+```
+
+<FileTree items={[
+  { label: "src", children: [
+    { label: "pages", children: [
+      { label: "tags", children: [
+        { label: "[tag]", children: [
+          { label: "[...page].astro", note: "generated automatically" },
+        ]},
+      ]},
+    ]},
+  ]},
+]} />
+
+## Frontmatter tips
+
+<Callout type="success" title="Title length">
+  Keep titles under 60 characters for Google — the SEO preview in the Frontmatter tab shows a live meter.
+</Callout>
+
+<Callout type="warn" title="Description length">
+  Descriptions over 160 characters are truncated in search results. The meter turns orange around 130 and red at 160.
+</Callout>

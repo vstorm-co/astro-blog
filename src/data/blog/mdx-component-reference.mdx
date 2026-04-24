@@ -1,0 +1,394 @@
+---
+title: MDX Component Reference
+description: >-
+  Every custom component available in this template — with live examples, props,
+  and copy-paste snippets.
+pubDate: 2026-04-24
+author: Jane Doe
+tags:
+  - meta
+  - reference
+  - components
+heroImage: /images/blog/components-reference/figure-example.webp
+---
+
+import Callout from "@/components/blog/Callout.astro";
+import Aside from "@/components/blog/Aside.astro";
+import Badge from "@/components/blog/Badge.astro";
+import Bookmark from "@/components/blog/Bookmark.astro";
+import Details from "@/components/blog/Details.astro";
+import Divider from "@/components/blog/Divider.astro";
+import Figure from "@/components/blog/Figure.astro";
+import FileTree from "@/components/blog/FileTree.astro";
+import InfoCard from "@/components/blog/InfoCard.astro";
+import Kbd from "@/components/blog/Kbd.astro";
+import PullQuote from "@/components/blog/PullQuote.astro";
+import Stat from "@/components/blog/Stat.astro";
+import Steps from "@/components/blog/Steps.astro";
+import Terminal from "@/components/blog/Terminal.astro";
+import Timeline from "@/components/blog/Timeline.astro";
+import Testimonial from "@/components/blog/Testimonial.astro";
+import TwoColumn from "@/components/blog/TwoColumn.astro";
+
+This is your component reference. Each section shows the import, props, and a live example. Keep this post as a reference or delete it once you're familiar with the components.
+
+<Callout type="info" title="Tip">
+  In the admin panel, open the **Components** tab on the right to browse and insert snippets without copying from this page.
+</Callout>
+
+---
+
+## Callout
+
+Highlighted boxes for important information. Four severity levels.
+
+```mdx
+import Callout from "@/components/blog/Callout.astro";
+
+<Callout type="info" title="Heads up">
+  Your message here.
+</Callout>
+```
+
+| Prop | Type | Default | Notes |
+|------|------|---------|-------|
+| `type` | `info \| warn \| success \| danger` | `info` | Controls colour |
+| `title` | `string` | — | Optional bold heading inside the box |
+
+<Callout type="info" title="Info">
+  Use `info` for neutral notes, tips, and supplementary context.
+</Callout>
+
+<Callout type="warn" title="Warning">
+  Use `warn` for non-blocking cautions — something worth noticing before proceeding.
+</Callout>
+
+<Callout type="success" title="Success">
+  Use `success` for confirmations, "you're done" moments, or positive results.
+</Callout>
+
+<Callout type="danger" title="Danger">
+  Use `danger` for destructive actions or errors that will break things.
+</Callout>
+
+---
+
+## Steps
+
+Numbered step list for tutorials and how-tos.
+
+```mdx
+import Steps from "@/components/blog/Steps.astro";
+
+<Steps items={[
+  { title: "First step", body: "What to do." },
+  { title: "Second step", body: "What to do next." },
+]} />
+```
+
+| Prop | Type | Notes |
+|------|------|-------|
+| `items` | `{ title: string; body?: string }[]` | Each item renders as a numbered card |
+
+<Steps items={[
+  { title: "Install dependencies", body: "Run bun install in the project root." },
+  { title: "Configure the site", body: "Edit src/site.config.ts with your identity and settings." },
+  { title: "Deploy", body: "Push to GitHub and import on Vercel — detected automatically." },
+]} />
+
+---
+
+## Figure
+
+Image with optional caption and border. Preferred over raw `![]()` syntax.
+
+```mdx
+import Figure from "@/components/blog/Figure.astro";
+
+<Figure
+  src="/images/blog/my-post/screenshot.webp"
+  alt="Descriptive alt text"
+  caption="Optional caption below the image."
+/>
+```
+
+{/* TODO: Add a real screenshot here */}
+<Figure src="/images/blog/components-reference/figure-example.webp" alt="TODO: replace with a real screenshot" caption="Figure renders a full-width image with a border, rounded corners, and optional caption." />
+
+---
+
+## FileTree
+
+Visual directory tree for showing folder structures.
+
+```mdx
+import FileTree from "@/components/blog/FileTree.astro";
+
+<FileTree items={[
+  { label: "src", children: [
+    { label: "pages", children: [{ label: "index.astro" }] },
+    { label: "site.config.ts", note: "← edit this" },
+  ]},
+]} />
+```
+
+<FileTree items={[
+  { label: "src", children: [
+    { label: "data", children: [
+      { label: "blog", children: [
+        { label: "getting-started.mdx" },
+        { label: "writing-posts.mdx" },
+      ]},
+    ]},
+    { label: "components", children: [
+      { label: "blog", note: "custom components" },
+      { label: "admin", note: "admin panel" },
+    ]},
+    { label: "site.config.ts", note: "← your config" },
+  ]},
+  { label: "public", children: [
+    { label: "images" },
+  ]},
+]} />
+
+---
+
+## InfoCard
+
+Titled card with optional icon and internal link.
+
+```mdx
+import InfoCard from "@/components/blog/InfoCard.astro";
+
+<InfoCard title="Read the guide" icon="📖" href="/posts/getting-started/">
+  Get up and running in under 15 minutes.
+</InfoCard>
+```
+
+<InfoCard title="Getting Started" icon="🚀" href="/posts/getting-started/">
+  Clone, configure, and deploy your blog in under 15 minutes.
+</InfoCard>
+
+<InfoCard title="No link version" icon="💡">
+  Omit `href` for a non-clickable card. Use it for supplementary notes that don't warrant a full callout.
+</InfoCard>
+
+---
+
+## PullQuote
+
+Large typographic quote, great for testimonials and key insights.
+
+```mdx
+import PullQuote from "@/components/blog/PullQuote.astro";
+
+<PullQuote author="Name, Role">
+  The quote text goes here.
+</PullQuote>
+```
+
+<PullQuote author="Donald Knuth, The Art of Computer Programming">
+  Premature optimization is the root of all evil.
+</PullQuote>
+
+---
+
+## Testimonial
+
+Quote with avatar, name, and role. Better than PullQuote for social proof.
+
+```mdx
+import Testimonial from "@/components/blog/Testimonial.astro";
+
+<Testimonial
+  quote="This saved us 10 hours a week."
+  name="Jane Smith"
+  role="CTO at Acme"
+  avatar="/images/avatars/jane.png"
+/>
+```
+
+---
+
+## Stat
+
+Single highlighted metric. Stack several for a stats row.
+
+```mdx
+import Stat from "@/components/blog/Stat.astro";
+
+<Stat value="10×" label="Faster than manual setup" trend="up" />
+```
+
+| Prop | Type | Notes |
+|------|------|-------|
+| `value` | `string` | The big number or text |
+| `label` | `string` | Description below the value |
+| `trend` | `up \| down` | Optional arrow indicator |
+
+<Stat value="17" label="pages generated at build" trend="up" />
+
+---
+
+## TwoColumn
+
+Side-by-side layout for comparisons. Renders as a single column on mobile.
+
+```mdx
+import TwoColumn from "@/components/blog/TwoColumn.astro";
+
+<TwoColumn leftTitle="Before" rightTitle="After">
+  <Fragment slot="left">Left content.</Fragment>
+  <Fragment slot="right">Right content.</Fragment>
+</TwoColumn>
+```
+
+<TwoColumn leftTitle="Without MDX components" rightTitle="With MDX components">
+  <Fragment slot="left">
+    Plain markdown only. Every callout is a blockquote. Every step list is a numbered list. Everything looks the same.
+  </Fragment>
+  <Fragment slot="right">
+    Custom components for callouts, steps, stats, timelines, and more. Readers can scan and understand structure at a glance.
+  </Fragment>
+</TwoColumn>
+
+---
+
+## Terminal
+
+Styled terminal block for shell commands.
+
+```mdx
+import Terminal from "@/components/blog/Terminal.astro";
+
+<Terminal>
+  bun run dev
+  bun run build
+</Terminal>
+```
+
+<Terminal>
+  bun run dev
+  bun run build
+  bun run preview
+</Terminal>
+
+---
+
+## Timeline
+
+Vertical chronological list.
+
+```mdx
+import Timeline from "@/components/blog/Timeline.astro";
+
+<Timeline items={[
+  { date: "Jan 2024", title: "v1.0 released", body: "Initial public launch." },
+  { date: "Mar 2024", title: "Admin panel added", body: "Visual editor ships." },
+]} />
+```
+
+<Timeline items={[
+  { date: "Apr 2026", title: "Template launched", body: "Astro 5 + admin panel + 30 MDX components." },
+  { date: "Your date", title: "Your first post", body: "Write something and publish it." },
+]} />
+
+---
+
+## Details
+
+Collapsible section wrapping the native `<details>` element.
+
+```mdx
+import Details from "@/components/blog/Details.astro";
+
+<Details summary="Why is this collapsed?">
+  Content that expands on click. Great for FAQs and long supplementary notes.
+</Details>
+```
+
+<Details summary="Why use Details instead of a plain details element?">
+  The `<Details>` component applies consistent styling — matching the post typography, colours, and spacing — so it looks native to the design.
+</Details>
+
+---
+
+## Badge
+
+Inline label for tagging content status.
+
+```mdx
+import Badge from "@/components/blog/Badge.astro";
+
+This feature is <Badge>experimental</Badge> and <Badge tone="success">stable</Badge>.
+```
+
+| `tone` | Usage |
+|--------|-------|
+| (default) | neutral, grey |
+| `success` | green, positive status |
+| `warn` | yellow, caution |
+| `danger` | red, deprecated or broken |
+
+This component is <Badge>stable</Badge>, this one is <Badge tone="warn">deprecated</Badge>, and this one is <Badge tone="danger">removed</Badge>.
+
+---
+
+## Kbd
+
+Keyboard key styling for shortcut references.
+
+```mdx
+import Kbd from "@/components/blog/Kbd.astro";
+
+Press <Kbd>⌘</Kbd> + <Kbd>K</Kbd> to open the command palette.
+```
+
+Press <Kbd>⌘</Kbd> + <Kbd>Shift</Kbd> + <Kbd>P</Kbd> to open the VS Code command palette.
+
+---
+
+## Aside
+
+Lateral note or annotation, narrower than a Callout. Floats to the side on wider screens.
+
+```mdx
+import Aside from "@/components/blog/Aside.astro";
+
+<Aside>
+  A shorter note that doesn't interrupt the reading flow.
+</Aside>
+```
+
+---
+
+## Bookmark
+
+Link card with title, description, and domain — like an unfurl preview.
+
+```mdx
+import Bookmark from "@/components/blog/Bookmark.astro";
+
+<Bookmark
+  href="https://docs.astro.build"
+  title="Astro Docs"
+  description="Everything you need to build with Astro."
+  domain="docs.astro.build"
+/>
+```
+
+---
+
+## Divider
+
+Visual section break, thematic separator between sections.
+
+```mdx
+import Divider from "@/components/blog/Divider.astro";
+
+<Divider />
+```
+
+<Divider />
+
+That's all the components. Check the **Components** tab in the admin panel for a quick-insert version of every snippet shown here.

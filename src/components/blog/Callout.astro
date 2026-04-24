@@ -1,0 +1,93 @@
+---
+export interface Props {
+  type?: "info" | "warn" | "success" | "danger";
+  title?: string;
+}
+const { type = "info", title } = Astro.props;
+const glyphs = { info: "i", warn: "!", success: "✓", danger: "×" } as const;
+---
+{/* @mdx-label Callout */}
+{/* @mdx-description Highlighted box — variants: info | warn | success | danger */}
+{/* @mdx-snippet
+<Callout type="info" title="Heads up">
+  Your message here.
+</Callout>
+*/}
+{/* @mdx-preview
+<div style="display:flex;flex-direction:column;gap:8px">
+  <div style="display:flex;gap:10px;padding:10px 14px;background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.3);border-radius:8px">
+    <span style="width:20px;height:20px;border-radius:50%;background:rgba(96,165,250,0.2);color:#60a5fa;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">i</span>
+    <div><p style="font-size:12px;font-weight:600;color:#60a5fa;margin:0 0 2px">Heads up</p><p style="font-size:12px;color:#a1a1aa;margin:0">Your message here.</p></div>
+  </div>
+  <div style="display:flex;gap:10px;padding:10px 14px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px">
+    <span style="width:20px;height:20px;border-radius:50%;background:rgba(251,191,36,0.2);color:#fbbf24;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">!</span>
+    <div><p style="font-size:12px;font-weight:600;color:#fbbf24;margin:0 0 2px">Warning</p><p style="font-size:12px;color:#a1a1aa;margin:0">type="warn"</p></div>
+  </div>
+</div>
+*/}
+
+<div class:list={["callout", `callout-${type}`]}>
+  <span class="callout-icon" aria-hidden>{glyphs[type]}</span>
+  <div class="callout-body">
+    {title && <p class="callout-title">{title}</p>}
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    margin: 1.5rem 0;
+    border-radius: 10px;
+    border-left: 3px solid;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+  .callout-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border: 1px solid currentColor;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+  .callout-body > :global(p) { margin: 0.25rem 0; }
+  .callout-body > :global(p):first-child { margin-top: 0; }
+  .callout-body > :global(p):last-child { margin-bottom: 0; }
+  .callout-title { font-weight: 600; margin-bottom: 0.35rem !important; }
+
+  .callout-info {
+    border-color: #4c7fff;
+    background: rgba(76, 127, 255, 0.08);
+    color: #a7c0ff;
+  }
+  :root[data-theme="light"] .callout-info { color: #3257c4; }
+
+  .callout-warn {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+    color: #fbbf24;
+  }
+  :root[data-theme="light"] .callout-warn { color: #b45309; }
+
+  .callout-success {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+  }
+  :root[data-theme="light"] .callout-success { color: #047857; }
+
+  .callout-danger {
+    border-color: #f43f5e;
+    background: rgba(244, 63, 94, 0.1);
+    color: #fb7185;
+  }
+  :root[data-theme="light"] .callout-danger { color: #be123c; }
+</style>

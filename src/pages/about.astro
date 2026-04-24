@@ -1,0 +1,116 @@
+---
+import { getEntry, render } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { breadcrumbSchema } from "@/lib/schemas";
+import { SITE } from "@/site.config";
+import { SOCIALS } from "@/socials";
+import Icon from "@/components/icons/Icon.astro";
+import "@/styles/prose.css";
+
+const entry = await getEntry("pages", "about");
+if (!entry) throw new Error("src/data/pages/about.mdx is missing.");
+const { Content } = await render(entry);
+const schemas = [
+  breadcrumbSchema([
+    { name: "Home", url: SITE.website },
+    { name: entry.data.title, url: new URL("/about/", SITE.website).href },
+  ]),
+];
+---
+<BaseLayout title={entry.data.title} description={entry.data.description} schemas={schemas}>
+  <div class="container about-container">
+    <header class="about-header">
+      <p class="eyebrow">About</p>
+      <h1 class="about-title">{entry.data.title}</h1>
+      {entry.data.description && (
+        <p class="about-sub">{entry.data.description}</p>
+      )}
+    </header>
+
+    <article class="prose">
+      <Content />
+    </article>
+
+    {SOCIALS.length > 0 && (
+      <nav class="about-socials" aria-label="Social links">
+        <p class="about-socials-label">Elsewhere</p>
+        <ul>
+          {SOCIALS.map((s) => (
+            <li>
+              <a href={s.href} rel="me noopener noreferrer" target={s.href.startsWith("http") ? "_blank" : undefined} title={s.linkTitle}>
+                <Icon name={s.icon} size={16} aria-hidden="true" />
+                <span>{s.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .about-container {
+    padding: 3rem 1.5rem 5rem;
+  }
+  .about-header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .about-title {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    letter-spacing: -0.028em;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.08;
+  }
+  .about-sub {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+  .about-socials {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .about-socials-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin: 0 0 0.75rem;
+  }
+  .about-socials ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .about-socials a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    transition: all 0.15s;
+  }
+  .about-socials a:hover {
+    color: var(--color-accent);
+    border-color: var(--color-border-hover);
+    background: var(--color-surface-hover);
+  }
+</style>

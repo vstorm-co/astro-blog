@@ -1,0 +1,25 @@
+name: 🚀 Feature request
+description: Suggest something new
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What's painful today? Why does it matter?
+    validations: { required: true }
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What would the solution look like?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    attributes:
+      label: Scope
+      options:
+        - label: I've read the non-goals in notes/00-overview.md.
+          required: true

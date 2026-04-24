@@ -1,0 +1,105 @@
+---
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+  headings: MarkdownHeading[];
+}
+const { headings } = Astro.props;
+const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+{filtered.length > 1 && (
+  <nav class="toc" aria-labelledby="toc-heading">
+    <p id="toc-heading" class="toc-title">On this page</p>
+    <ol>
+      {filtered.map((h) => (
+        <li class:list={[`toc-depth-${h.depth}`]}>
+          <a href={`#${h.slug}`} data-toc-link={h.slug}>
+            {h.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .toc { font-size: 0.8rem; }
+  .toc-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-tertiary);
+    margin: 0 0 0.6rem;
+  }
+  .toc ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .toc a {
+    display: block;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    line-height: 1.4;
+    padding: 0.25rem 0 0.25rem 0.75rem;
+    border-left: 2px solid transparent;
+    margin-left: -1px;
+    transition: all 0.12s;
+  }
+  .toc a:hover { color: var(--color-text-secondary); }
+  .toc a.active {
+    color: var(--color-accent);
+    border-left-color: var(--color-accent);
+  }
+  .toc-depth-3 { padding-left: 0.75rem; }
+  .toc-depth-3 a { font-size: 0.75rem; }
+</style>
+
+<script is:inline>
+  (function () {
+    function init() {
+      var links = Array.from(document.querySelectorAll('[data-toc-link]'));
+      if (!links.length) return;
+
+      var slugs = links.map(function (l) { return l.getAttribute('data-toc-link'); });
+      var headingEls = slugs.map(function (s) { return document.getElementById(s); }).filter(Boolean);
+      if (!headingEls.length) return;
+
+      var current = null;
+
+      function update() {
+        var found = null;
+        for (var i = headingEls.length - 1; i >= 0; i--) {
+          if (headingEls[i].getBoundingClientRect().top <= 120) {
+            found = headingEls[i].id;
+            break;
+          }
+        }
+        if (found !== current) {
+          current = found;
+          links.forEach(function (l) {
+            if (l.getAttribute('data-toc-link') === current) {
+              l.classList.add('active');
+            } else {
+              l.classList.remove('active');
+            }
+          });
+        }
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+    document.addEventListener('astro:page-load', init);
+  })();
+</script>

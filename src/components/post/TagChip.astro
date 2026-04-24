@@ -1,0 +1,42 @@
+---
+import { toSlug } from "@/lib/slug";
+
+export interface Props {
+  tag: string;
+  size?: "sm" | "md";
+}
+const { tag, size = "sm" } = Astro.props;
+const href = `/tags/${toSlug(tag)}/`;
+---
+<a class:list={["tag-chip", `tag-chip-${size}`]} href={href}>
+  <span class="tag-chip-hash">#</span>{tag}
+</a>
+
+<style>
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 0.2rem 0.6rem;
+    color: var(--color-text-secondary);
+    background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.15s;
+  }
+  .tag-chip-sm { font-size: 0.75rem; }
+  .tag-chip-md { font-size: 0.875rem; padding: 0.35rem 0.85rem; }
+  .tag-chip-hash {
+    color: var(--color-text-tertiary);
+    margin-right: 0.05rem;
+    font-weight: 500;
+  }
+  .tag-chip:hover {
+    color: var(--color-accent);
+    border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+    background: var(--color-accent-soft);
+  }
+  .tag-chip:hover .tag-chip-hash { color: var(--color-accent); }
+</style>

@@ -1,0 +1,91 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SearchUI from "@/components/islands/SearchUI";
+import { SITE } from "@/site.config";
+
+if (!SITE.features.search) {
+  return Astro.redirect("/posts/");
+}
+---
+<BaseLayout title="Search" description={`Search posts on ${SITE.title}`}>
+  <div class="container search-page">
+    <header class="search-header">
+      <p class="eyebrow">Search</p>
+      <h1>Find a post</h1>
+    </header>
+    <SearchUI client:idle />
+  </div>
+</BaseLayout>
+
+<style>
+  .search-page {
+    padding: 3rem 1.5rem 6rem;
+    max-width: 700px;
+  }
+  .search-header {
+    margin-bottom: 2rem;
+  }
+  .search-header h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin: 0.25rem 0 0;
+  }
+  :global(.search-input) {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 1.5rem;
+  }
+  :global(.search-input:focus) {
+    border-color: var(--color-accent);
+  }
+  :global(.search-status) {
+    color: var(--color-text-tertiary);
+    font-size: 0.9rem;
+  }
+  :global(.search-results) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  :global(.search-results li a) {
+    display: block;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    text-decoration: none;
+    background: var(--color-surface);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  :global(.search-results li a:hover) {
+    border-color: var(--color-accent);
+    background: var(--color-surface-hover);
+  }
+  :global(.search-results li a strong) {
+    display: block;
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+  :global(.search-results li a span) {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  :global(.search-results mark) {
+    background: color-mix(in srgb, var(--color-accent) 25%, transparent);
+    color: inherit;
+    border-radius: 2px;
+  }
+</style>

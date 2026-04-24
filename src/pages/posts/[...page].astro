@@ -1,0 +1,501 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getAllPosts, readingTimeMinutes } from "@/lib/posts";
+import { SITE } from "@/site.config";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getAllPosts();
+  return [{ params: { page: undefined }, props: { posts } }];
+};
+
+const { posts } = Astro.props as { posts: Awaited<ReturnType<typeof getAllPosts>> };
+
+const postsData = posts.map((p) => ({
+  slug: p.id,
+  title: p.data.title,
+  description: p.data.description ?? "",
+  pubDate: p.data.pubDate.toISOString().slice(0, 10),
+  author: p.data.author,
+  tags: p.data.tags,
+  heroImage: p.data.heroImage ?? null,
+  readingMin: readingTimeMinutes(p.body),
+}));
+---
+<BaseLayout
+  title="Blog"
+  description={`All posts from ${SITE.title}`}
+>
+  <div class="container listing">
+    <header class="listing-header">
+      <p class="eyebrow">Blog</p>
+      <h1 class="listing-title">Writing</h1>
+      <div class="listing-search-wrap">
+        <svg class="listing-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          id="posts-search"
+          type="search"
+          class="listing-search"
+          placeholder="Search posts, tags, authors…"
+          aria-label="Search posts"
+          autocomplete="off"
+        />
+      </div>
+    </header>
+
+    <div class="listing-controls">
+      <span id="posts-count" class="listing-count"></span>
+      <div class="listing-view-toggle" role="group" aria-label="View mode">
+        <button id="btn-grid" class="view-btn" aria-pressed="true" title="Grid view">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
+            <rect x="0" y="0" width="6" height="6" rx="1"/>
+            <rect x="9" y="0" width="6" height="6" rx="1"/>
+            <rect x="0" y="9" width="6" height="6" rx="1"/>
+            <rect x="9" y="9" width="6" height="6" rx="1"/>
+          </svg>
+        </button>
+        <button id="btn-list" class="view-btn" aria-pressed="false" title="List view">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
+            <rect x="4" y="1" width="11" height="2" rx="1"/>
+            <rect x="0" y="1" width="2.5" height="2" rx="0.5"/>
+            <rect x="4" y="6.5" width="11" height="2" rx="1"/>
+            <rect x="0" y="6.5" width="2.5" height="2" rx="0.5"/>
+            <rect x="4" y="12" width="11" height="2" rx="1"/>
+            <rect x="0" y="12" width="2.5" height="2" rx="0.5"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="posts-container"></div>
+    <div id="posts-pagination"></div>
+
+    <noscript>
+      <ul class="noscript-list">
+        {posts.map((p) => (
+          <li><a href={`/posts/${p.id}/`}>{p.data.title}</a></li>
+        ))}
+      </ul>
+    </noscript>
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .listing { padding: 3rem 1.5rem 5rem; }
+  .listing-header {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+    text-align: center;
+  }
+  .listing-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.025em;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  /* Search */
+  .listing-search-wrap {
+    position: relative;
+    width: min(480px, 100%);
+    margin-top: 0.75rem;
+  }
+  .listing-search-icon {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-tertiary);
+    pointer-events: none;
+  }
+  .listing-search {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    padding: 0.65rem 1rem 0.65rem 2.5rem;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .listing-search:focus { border-color: var(--color-accent); }
+  .listing-search::placeholder { color: var(--color-text-tertiary); }
+
+  /* Controls row */
+  .listing-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    min-height: 2rem;
+  }
+  .listing-count {
+    font-size: 0.82rem;
+    color: var(--color-text-tertiary);
+  }
+  .listing-view-toggle {
+    display: flex;
+    gap: 2px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .view-btn:hover { color: var(--color-text); background: var(--color-surface-hover); }
+  .view-btn.active { background: var(--color-accent); color: #fff; }
+
+  /* Grid cards */
+  .lc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+  .lc-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    background: var(--color-surface);
+    transition: all 0.15s;
+  }
+  .lc-card:hover { border-color: var(--color-border-hover); transform: translateY(-2px); }
+  .lc-card:hover .lc-title { color: var(--color-accent); }
+
+  .lc-cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-surface-hover);
+  }
+  .lc-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+  }
+  .lc-card:hover .lc-cover-img { transform: scale(1.04); }
+  .lc-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-surface-hover) 0%, color-mix(in srgb, var(--color-accent) 8% , var(--color-surface-hover)) 100%);
+  }
+  .lc-letter {
+    font-size: 3rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--color-accent) 30%, var(--color-text-tertiary));
+    letter-spacing: -0.05em;
+    user-select: none;
+  }
+  .lc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 1rem;
+    flex: 1;
+  }
+  .lc-tags { display: flex; gap: 0.4rem; }
+  .lc-tag { font-size: 0.7rem; color: var(--color-accent); font-weight: 500; }
+  .lc-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 0;
+    color: var(--color-text);
+    letter-spacing: -0.015em;
+    transition: color 0.15s;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .lc-desc {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .lc-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.76rem;
+    color: var(--color-text-tertiary);
+    margin-top: auto;
+    padding-top: 0.35rem;
+    flex-wrap: wrap;
+  }
+
+  /* List rows */
+  .lc-list { border-top: 1px solid var(--color-border); }
+  .lc-row {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-border);
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.15s;
+  }
+  .lc-row:hover .lc-row-title { color: var(--color-accent); }
+  .lc-row-date {
+    font-size: 0.82rem;
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .lc-row-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  .lc-row-title {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+    color: var(--color-text);
+    transition: color 0.15s;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lc-row-desc {
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lc-row-meta {
+    color: var(--color-text-tertiary);
+    font-size: 0.76rem;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+  }
+  @media (max-width: 640px) {
+    .lc-row { grid-template-columns: 1fr; gap: 0.25rem; }
+    .lc-row-meta { display: none; }
+    .lc-row-date { font-size: 0.78rem; }
+  }
+
+  /* Empty */
+  .lc-empty {
+    text-align: center;
+    color: var(--color-text-tertiary);
+    padding: 3rem 0;
+    font-size: 0.9rem;
+  }
+
+  /* Pagination */
+  .pg-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
+  .pg-btn {
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pg-btn:hover { border-color: var(--color-border-hover); color: var(--color-text); }
+  .pg-btn.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .pg-ellipsis { color: var(--color-text-tertiary); font-size: 0.82rem; padding: 0 0.2rem; }
+
+  .noscript-list { padding: 2rem 0; }
+  .noscript-list a { color: var(--color-accent); }
+</style>
+
+<script define:vars={{ postsData }}>
+(function () {
+  var POSTS_PER_PAGE = 20;
+  var allPosts = postsData;
+  var filteredPosts = allPosts;
+
+  var state = {
+    query: '',
+    page: 1,
+    view: (function() { try { return localStorage.getItem('blog-view') || 'grid'; } catch(e) { return 'grid'; } })(),
+  };
+
+  var container = document.getElementById('posts-container');
+  var paginationEl = document.getElementById('posts-pagination');
+  var countEl = document.getElementById('posts-count');
+  var searchInput = document.getElementById('posts-search');
+  var btnGrid = document.getElementById('btn-grid');
+  var btnList = document.getElementById('btn-list');
+
+  function esc(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function fmtDate(iso) {
+    try { return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+    catch(e) { return iso; }
+  }
+
+  function gridCard(p) {
+    var img = p.heroImage
+      ? '<img src="' + esc(p.heroImage) + '" alt="' + esc(p.title) + '" class="lc-cover-img" loading="lazy" decoding="async" />'
+      : '<div class="lc-placeholder"><span class="lc-letter">' + esc(p.title.charAt(0)) + '</span></div>';
+    var tags = p.tags.slice(0, 2).map(function(t) { return '<span class="lc-tag">#' + esc(t) + '</span>'; }).join('');
+    return '<a class="lc-card" href="/posts/' + esc(p.slug) + '/">'
+      + '<div class="lc-cover">' + img + '</div>'
+      + '<div class="lc-body">'
+      + (tags ? '<div class="lc-tags">' + tags + '</div>' : '')
+      + '<h2 class="lc-title">' + esc(p.title) + '</h2>'
+      + '<p class="lc-desc">' + esc(p.description) + '</p>'
+      + '<div class="lc-meta"><span>' + fmtDate(p.pubDate) + '</span><span aria-hidden="true">·</span><span>' + esc(p.author) + '</span><span aria-hidden="true">·</span><span>' + p.readingMin + ' min</span></div>'
+      + '</div></a>';
+  }
+
+  function listRow(p) {
+    return '<a class="lc-row" href="/posts/' + esc(p.slug) + '/">'
+      + '<span class="lc-row-date">' + fmtDate(p.pubDate) + '</span>'
+      + '<span class="lc-row-body"><span class="lc-row-title">' + esc(p.title) + '</span><span class="lc-row-desc">' + esc(p.description) + '</span></span>'
+      + '<span class="lc-row-meta"><span>' + esc(p.author) + '</span><span>' + p.readingMin + ' min</span></span>'
+      + '</a>';
+  }
+
+  function renderPagination(cur, total) {
+    if (total <= 1) { paginationEl.innerHTML = ''; return; }
+    var parts = [];
+    if (cur > 1) parts.push('<button class="pg-btn" data-page="' + (cur - 1) + '" aria-label="Previous">←</button>');
+    var lo = Math.max(1, cur - 2), hi = Math.min(total, cur + 2);
+    if (lo > 1) { parts.push('<button class="pg-btn" data-page="1">1</button>'); if (lo > 2) parts.push('<span class="pg-ellipsis">…</span>'); }
+    for (var i = lo; i <= hi; i++) {
+      parts.push('<button class="pg-btn' + (i === cur ? ' active' : '') + '" data-page="' + i + '"' + (i === cur ? ' aria-current="page"' : '') + '>' + i + '</button>');
+    }
+    if (hi < total) { if (hi < total - 1) parts.push('<span class="pg-ellipsis">…</span>'); parts.push('<button class="pg-btn" data-page="' + total + '">' + total + '</button>'); }
+    if (cur < total) parts.push('<button class="pg-btn" data-page="' + (cur + 1) + '" aria-label="Next">→</button>');
+    paginationEl.innerHTML = '<div class="pg-wrap">' + parts.join('') + '</div>';
+    paginationEl.querySelectorAll('.pg-btn[data-page]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        state.page = parseInt(btn.getAttribute('data-page'), 10);
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  }
+
+  function render() {
+    var start = (state.page - 1) * POSTS_PER_PAGE;
+    var slice = filteredPosts.slice(start, start + POSTS_PER_PAGE);
+    var total = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+
+    if (filteredPosts.length === 0) {
+      container.innerHTML = '<div class="lc-empty">No posts match your search.</div>';
+      paginationEl.innerHTML = '';
+      countEl.textContent = '0 results';
+      return;
+    }
+
+    var html = state.view === 'grid'
+      ? '<div class="lc-grid">' + slice.map(gridCard).join('') + '</div>'
+      : '<div class="lc-list">' + slice.map(listRow).join('') + '</div>';
+    container.innerHTML = html;
+    renderPagination(state.page, total);
+
+    countEl.textContent = state.query
+      ? filteredPosts.length + ' result' + (filteredPosts.length !== 1 ? 's' : '') + ' for "' + state.query + '"'
+      : filteredPosts.length + ' post' + (filteredPosts.length !== 1 ? 's' : '');
+
+    btnGrid.setAttribute('aria-pressed', state.view === 'grid' ? 'true' : 'false');
+    btnGrid.classList.toggle('active', state.view === 'grid');
+    btnList.setAttribute('aria-pressed', state.view === 'list' ? 'true' : 'false');
+    btnList.classList.toggle('active', state.view === 'list');
+  }
+
+  function applySearch() {
+    var q = state.query.toLowerCase().trim();
+    filteredPosts = q ? allPosts.filter(function(p) {
+      return p.title.toLowerCase().includes(q)
+        || p.description.toLowerCase().includes(q)
+        || p.author.toLowerCase().includes(q)
+        || p.tags.some(function(t) { return t.toLowerCase().includes(q); });
+    }) : allPosts;
+    state.page = 1;
+    render();
+  }
+
+  render();
+
+  var debounce;
+  searchInput.addEventListener('input', function() {
+    clearTimeout(debounce);
+    var v = searchInput.value;
+    debounce = setTimeout(function() { state.query = v; applySearch(); }, 180);
+  });
+
+  function setView(v) {
+    if (state.view === v) return;
+    state.view = v;
+    try { localStorage.setItem('blog-view', v); } catch(e) {}
+    render();
+  }
+
+  btnGrid.addEventListener('click', function() { setView('grid'); });
+  btnList.addEventListener('click', function() { setView('list'); });
+})();
+</script>

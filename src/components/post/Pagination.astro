@@ -1,0 +1,115 @@
+---
+export interface Props {
+  currentPage: number;
+  lastPage: number;
+  url: { prev?: string; next?: string };
+  basePath: string; // e.g. "/posts/" or "/tags/astro/"
+}
+
+const { currentPage, lastPage, url, basePath } = Astro.props;
+
+const pages: Array<number | "ellipsis"> = [];
+const push = (v: number | "ellipsis") => pages.push(v);
+const windowSize = 1;
+for (let i = 1; i <= lastPage; i++) {
+  if (
+    i === 1 ||
+    i === lastPage ||
+    (i >= currentPage - windowSize && i <= currentPage + windowSize)
+  ) {
+    push(i);
+  } else if (pages[pages.length - 1] !== "ellipsis") {
+    push("ellipsis");
+  }
+}
+
+const pageHref = (n: number) => (n === 1 ? basePath : `${basePath}${n}/`);
+---
+{lastPage > 1 && (
+  <nav class="pagination" aria-label="Pagination">
+    <a
+      class:list={["pg-btn", { disabled: !url.prev }]}
+      href={url.prev ?? "#"}
+      aria-disabled={!url.prev}
+      rel="prev"
+    >← Prev</a>
+    <ol class="pg-pages">
+      {pages.map((p) =>
+        p === "ellipsis" ? (
+          <li class="pg-ellipsis" aria-hidden>…</li>
+        ) : (
+          <li>
+            <a
+              href={pageHref(p)}
+              aria-current={p === currentPage ? "page" : undefined}
+              class:list={["pg-num", { active: p === currentPage }]}
+            >{p}</a>
+          </li>
+        )
+      )}
+    </ol>
+    <a
+      class:list={["pg-btn", { disabled: !url.next }]}
+      href={url.next ?? "#"}
+      aria-disabled={!url.next}
+      rel="next"
+    >Next →</a>
+  </nav>
+)}
+
+<style>
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+  }
+  .pg-btn {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+  }
+  .pg-btn:hover:not(.disabled) {
+    color: var(--color-text);
+    border-color: var(--color-border-hover);
+  }
+  .pg-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .pg-pages {
+    list-style: none;
+    display: flex;
+    gap: 0.25rem;
+    padding: 0;
+    margin: 0;
+  }
+  .pg-num {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 2rem;
+    height: 2rem;
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  .pg-num:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+  .pg-num.active {
+    background: var(--color-accent);
+    color: white;
+  }
+  .pg-ellipsis {
+    padding: 0 0.25rem;
+    color: var(--color-text-tertiary);
+  }
+</style>

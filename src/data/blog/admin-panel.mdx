@@ -1,0 +1,125 @@
+---
+title: Using the Admin Panel
+description: >-
+  A walkthrough of the built-in local admin panel — creating posts, editing
+  frontmatter, uploading images, and previewing your content.
+pubDate: 2026-04-24
+author: Jane Doe
+tags:
+  - meta
+  - guide
+  - admin
+heroImage: /images/blog/admin-panel/images-tab.webp
+---
+
+import Callout from "@/components/blog/Callout.astro";
+import Steps from "@/components/blog/Steps.astro";
+import Figure from "@/components/blog/Figure.astro";
+import InfoCard from "@/components/blog/InfoCard.astro";
+import Kbd from "@/components/blog/Kbd.astro";
+import TwoColumn from "@/components/blog/TwoColumn.astro";
+
+The admin panel is a local-only editor that runs alongside your dev server. It reads and writes the same `.mdx` files you'd edit by hand — no database, no sync, just files. It's designed for comfortable writing without switching to your code editor for every metadata change.
+
+<Callout type="warn" title="Dev only">
+  The admin panel is only available at `http://localhost:4321/admin/` during local development. It's excluded from production builds via the Astro sitemap config.
+</Callout>
+
+## Opening the panel
+
+Start the dev server and navigate to the admin URL:
+
+```bash
+bun run dev
+# → open http://localhost:4321/admin/
+```
+
+{/* TODO: Add screenshot of the admin panel overview */}
+<Figure src="/images/blog/admin-panel/overview.webp" alt="TODO: screenshot of the admin panel with a post selected" caption="The admin panel: sidebar (posts list), main editor, and live preview." />
+
+## Layout overview
+
+The panel has three columns:
+
+1. **Left sidebar** — list of all posts with search, date, and tags. Click a post to load it.
+2. **Main panel** — the editor. Switch between **Content** (MDX editor) and **Frontmatter** (metadata form) tabs.
+3. **Right panel** — switch between **Preview** (live render), **Components** (insert snippets), and **Images** (upload and manage).
+
+## Creating a post
+
+<Steps items={[
+  { title: "Click + New in the top-left", body: "A dialog opens asking for a title. The slug is auto-generated from the title." },
+  { title: "Enter a title and click Create", body: "The file is created at src/data/blog/your-slug.mdx with a draft frontmatter block." },
+  { title: "Start writing in the Content tab", body: "The MDX editor opens immediately. Autosave kicks in after 900ms of inactivity." },
+]} />
+
+<Figure src="/images/blog/admin-panel/new-post-dialog.webp" alt="Screenshot of the new post dialog" caption="The new post dialog auto-generates a URL-safe slug from the title." />
+
+## The content editor
+
+The editor is CodeMirror with Markdown syntax highlighting. Write standard Markdown and MDX — component imports, JSX, everything.
+
+Keyboard shortcuts:
+- <Kbd>⌘</Kbd> + <Kbd>S</Kbd> — force save immediately
+- Autosave triggers 900ms after you stop typing
+
+<Callout type="info" title="Inserting components">
+  Open the **Components** tab in the right panel, find a component, and click **Insert**. The snippet is inserted at your cursor position and the editor briefly highlights where it landed.
+</Callout>
+
+## The frontmatter tab
+
+Switch to **Frontmatter** to edit metadata without touching YAML. The form includes:
+
+- **Slug** — editable, with a lock toggle. Unlocked: auto-follows the title. Locked: edit independently.
+- **Title** and **Description** — with character meters showing SEO status.
+- **Search preview** — live rendering of how the post appears in Google.
+- **Hero image** — text input plus a picker that shows images already uploaded for this post.
+- **Publish date** and **Updated date** — date pickers.
+- **Author** and **Tags** — tag badges (press Enter or comma to add).
+- **Draft** and **Featured** toggles.
+
+<Figure src="/images/blog/admin-panel/frontmatter.webp" alt="Screenshot of the Frontmatter editing form" caption="The Frontmatter tab — no YAML editing required." />
+
+## Managing images
+
+Click the **Images** tab in the right panel to see all images uploaded for the currently open post.
+
+<Steps items={[
+  { title: "Upload an image", body: "Drag and drop or click the upload area. Images are saved to public/images/blog/your-slug/." },
+  { title: "Copy the URL", body: "Click Copy URL on any image card. The button briefly shows ✓ Copied." },
+  { title: "Set as cover", body: "Click the star button on any image to set it as the post's heroImage in the frontmatter." },
+  { title: "Delete an image", body: "Click the trash icon. A confirmation dialog appears before deletion." },
+]} />
+
+<Figure src="/images/blog/admin-panel/images-tab.webp" alt="Screenshot of the Images tab with uploaded images" caption="The Images tab shows all assets for the current post with quick actions." />
+
+## Live preview
+
+The **Preview** tab shows a full render of the post as it will appear on the site — including custom components, syntax highlighting, and styles. It updates on every autosave.
+
+<TwoColumn leftTitle="What you write" rightTitle="What readers see">
+  <Fragment slot="left">
+    Raw MDX in the editor — frontmatter, component imports, and prose mixed together.
+  </Fragment>
+  <Fragment slot="right">
+    Fully rendered post with the blog layout, dark/light mode, all components resolved.
+  </Fragment>
+</TwoColumn>
+
+## Deleting a post
+
+Click **Delete** in the top-right of the main panel. A confirmation dialog appears — the action permanently removes the `.mdx` file. There's no undo (use git to recover).
+
+## Sidebar
+
+The sidebar lists all posts with:
+- **Title** and **draft/featured badges**
+- **Publish date**
+- **Tags** (up to 3 shown, `+N` for the rest)
+
+Use the search box to filter by title, slug, or tag.
+
+<InfoCard title="Files are just files" icon="📁">
+  Everything the admin panel does is a read or write to the `src/data/blog/` directory. You can edit files in your code editor at the same time — the panel reloads on file changes.
+</InfoCard>

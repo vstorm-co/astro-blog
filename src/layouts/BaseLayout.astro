@@ -1,0 +1,66 @@
+---
+import SEO from "@/components/layout/SEO.astro";
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
+import type { JsonLd } from "@/lib/schemas";
+import { websiteSchema } from "@/lib/schemas";
+import { SITE } from "@/site.config";
+import { accentVars } from "@/lib/color";
+import "@/styles/global.css";
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalURL?: string;
+  ogImage?: string;
+  ogType?: "website" | "article";
+  robots?: string;
+  schemas?: JsonLd[];
+}
+
+const { schemas = [], ...seo } = Astro.props;
+const allSchemas: JsonLd[] = [websiteSchema(), ...schemas];
+const cv = accentVars(SITE.accent);
+const themeStyle = [
+  `--_accent:${cv.accent}`,
+  `--_accent-hd:${cv.accentHoverDark}`,
+  `--_accent-sd:${cv.accentSoftDark}`,
+  `--_accent-hl:${cv.accentHoverLight}`,
+  `--_accent-sl:${cv.accentSoftLight}`,
+].join(";");
+---
+<!DOCTYPE html>
+<html lang={SITE.locale.split("-")[0]} data-theme="dark" style={themeStyle}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href={SITE.favicon} />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#7c5cff" />
+    <SEO {...seo} schemas={allSchemas} />
+    <script is:inline>
+      // Pre-paint theme init — dark by default, light only if explicitly stored.
+      try {
+        if (localStorage.getItem("theme") === "light")
+          document.documentElement.setAttribute("data-theme", "light");
+      } catch (_) {}
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <script is:inline>
+      document.addEventListener('load', function(e) {
+        if (e.target instanceof HTMLImageElement && e.target.hasAttribute('loading')) {
+          e.target.classList.add('loaded');
+        }
+      }, true);
+    </script>
+  </body>
+</html>

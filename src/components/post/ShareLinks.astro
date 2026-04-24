@@ -1,0 +1,118 @@
+---
+import { SHARE_LINKS } from "@/socials";
+import Icon from "@/components/icons/Icon.astro";
+
+export interface Props {
+  url: string;
+  title: string;
+}
+
+const { url, title } = Astro.props;
+const fill = (template: string) =>
+  template.replace("{url}", encodeURIComponent(url)).replace("{title}", encodeURIComponent(title));
+
+const iconMap: Record<string, string> = {
+  X: "x-fill",
+  LinkedIn: "linkedin-fill",
+  Email: "mail",
+};
+---
+<div class="share-row">
+  <span class="share-label">Share</span>
+  <div class="share-btns">
+    {SHARE_LINKS.map((link) => (
+      <a
+        href={fill(link.href)}
+        title={link.linkTitle}
+        rel="noopener noreferrer"
+        target={link.href.startsWith("http") ? "_blank" : undefined}
+        class="share-btn"
+        aria-label={link.linkTitle}
+      >
+        <Icon name={iconMap[link.name] ?? link.icon} size={15} aria-hidden="true" />
+      </a>
+    ))}
+    <button id="copy-url-btn" class="share-btn" aria-label="Copy link" title="Copy link" data-url={url}>
+      <Icon name="link" size={14} aria-hidden="true" />
+    </button>
+  </div>
+</div>
+
+<div id="copy-toast" class="copy-toast" aria-live="polite">Link copied!</div>
+
+<style>
+  .share-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .share-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+  }
+  .share-btns { display: flex; gap: 0.25rem; }
+  .share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    color: var(--color-text-tertiary);
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .share-btn:hover {
+    color: var(--color-accent);
+    border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+    background: var(--color-accent-soft);
+  }
+  .copy-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0.5rem);
+    background: var(--color-text);
+    color: var(--color-bg);
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s;
+    z-index: 50;
+    white-space: nowrap;
+  }
+  .copy-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    function init() {
+      var btn = document.getElementById('copy-url-btn');
+      var toast = document.getElementById('copy-toast');
+      if (!btn || !toast) return;
+      btn.addEventListener('click', function () {
+        var url = btn.getAttribute('data-url') || location.href;
+        navigator.clipboard.writeText(url).then(function () {
+          toast.classList.add('show');
+          setTimeout(function () { toast.classList.remove('show'); }, 2000);
+        });
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+    document.addEventListener('astro:page-load', init);
+  })();
+</script>

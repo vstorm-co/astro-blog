@@ -1,0 +1,104 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getAllTags } from "@/lib/posts";
+import { SITE } from "@/site.config";
+const tags = await getAllTags();
+const maxCount = Math.max(1, ...tags.map((t) => t.count));
+---
+<BaseLayout title="Tags" description={`Browse posts by tag on ${SITE.title}`}>
+  <div class="container tags-page">
+    <header class="tags-header">
+      <p class="eyebrow">Index</p>
+      <h1>Tags</h1>
+      <p class="tags-sub">
+        {tags.length} {tags.length === 1 ? "tag" : "tags"} across the archive.
+      </p>
+    </header>
+    {tags.length === 0 ? (
+      <p class="empty">No tags yet.</p>
+    ) : (
+      <ul class="tag-cloud">
+        {tags.map(({ tag, slug, count }) => {
+          const weight = count / maxCount;
+          const scale = 0.8 + weight * 0.8;
+          return (
+            <li>
+              <a
+                href={`/tags/${slug}/`}
+                class="tag-cloud-item"
+                style={`font-size: ${scale}rem`}
+              >
+                <span class="tag-cloud-name">#{tag}</span>
+                <span class="tag-cloud-count">{count}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .tags-page {
+    padding: 3rem 1.5rem 5rem;
+  }
+  .tags-header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .tags-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: -0.025em;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.05;
+  }
+  .tags-sub {
+    margin: 0;
+    color: var(--color-text-tertiary);
+    font-size: 0.925rem;
+  }
+  .tag-cloud {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .tag-cloud-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.45rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    line-height: 1;
+    transition: all 0.15s;
+  }
+  .tag-cloud-item:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+    transform: translateY(-1px);
+  }
+  .tag-cloud-count {
+    font-size: 0.72rem;
+    color: var(--color-text-tertiary);
+    background: var(--color-bg);
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    font-variant-numeric: tabular-nums;
+  }
+  .empty {
+    color: var(--color-text-tertiary);
+    padding: 2rem 0;
+  }
+</style>

@@ -1,0 +1,92 @@
+---
+import type { Post } from "@/lib/posts";
+import PostCard from "@/components/post/PostCard.astro";
+
+export interface Props {
+  posts: Post[];
+}
+const { posts } = Astro.props;
+
+const gridPosts = posts.slice(0, 3);
+const listPosts = posts.slice(3);
+---
+<section class="latest">
+  <div class="latest-head">
+    <span class="eyebrow">Writing</span>
+    <a href="/posts/" class="latest-more">
+      All posts
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+        <path d="M4 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+
+  {posts.length === 0 ? (
+    <p class="empty">No posts yet. Start writing in the <a href="/admin/">admin panel</a>.</p>
+  ) : (
+    <>
+      {gridPosts.length > 0 && (
+        <div class="posts-grid">
+          {gridPosts.map((post) => <PostCard post={post} variant="grid" />)}
+        </div>
+      )}
+
+      {listPosts.length > 0 && (
+        <div class="posts-list">
+          {listPosts.map((post) => <PostCard post={post} variant="row" />)}
+        </div>
+      )}
+    </>
+  )}
+</section>
+
+<style>
+  .latest {
+    padding: 2.5rem 0 4rem;
+  }
+  .latest-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+  .latest-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .latest-more:hover { color: var(--color-accent); }
+  .latest-more:hover svg { transform: translateX(2px); }
+  .latest-more svg { transition: transform 0.15s; }
+
+  /* Grid: first 3 posts */
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 0;
+  }
+  @media (max-width: 860px) {
+    .posts-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .posts-grid { grid-template-columns: 1fr; }
+  }
+
+  /* List: remaining posts */
+  .posts-list {
+    border-top: 1px solid var(--color-border);
+    margin-top: 1.5rem;
+  }
+
+  .empty {
+    padding: 2rem 0;
+    color: var(--color-text-tertiary);
+  }
+  .empty a { color: var(--color-accent); }
+</style>

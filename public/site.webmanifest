@@ -1,0 +1,17 @@
+{
+  "name": "My Blog",
+  "short_name": "Blog",
+  "description": "Thoughts, essays, and experiments on building software.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#7c5cff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

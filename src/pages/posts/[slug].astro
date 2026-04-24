@@ -1,0 +1,25 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getCollection, render } from "astro:content";
+import PostLayout from "@/layouts/PostLayout.astro";
+import { getAllPosts, getAdjacent } from "@/lib/posts";
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // In prod we only build published posts; in dev we build everything so drafts/scheduled posts preview.
+  const posts = import.meta.env.PROD
+    ? await getAllPosts()
+    : await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+};
+
+const { post } = Astro.props as { post: import("@/lib/posts").Post };
+const { Content, headings } = await render(post);
+const all = await getAllPosts();
+const { prev, next } = getAdjacent(all, post.id);
+---
+<PostLayout post={post} headings={headings} prev={prev} next={next}>
+  <Content />
+</PostLayout>

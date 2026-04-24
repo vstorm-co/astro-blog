@@ -1,0 +1,65 @@
+---
+import { SITE } from "@/site.config";
+import { SOCIALS } from "@/socials";
+import type { JsonLd } from "@/lib/schemas";
+
+const xSocial = SOCIALS.find((s) => s.icon === "x");
+const twitterCreator = xSocial
+  ? "@" + xSocial.href.replace(/.*x\.com\//, "").replace(/\/$/, "")
+  : undefined;
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalURL?: string;
+  ogImage?: string;
+  ogType?: "website" | "article";
+  robots?: string;
+  schemas?: JsonLd[];
+}
+
+const {
+  title,
+  description,
+  canonicalURL,
+  ogImage,
+  ogType = "website",
+  robots = "index, follow",
+  schemas = [],
+} = Astro.props;
+
+const pageTitle = title === SITE.title ? title : `${title} · ${SITE.title}`;
+const canonical = canonicalURL ?? new URL(Astro.url.pathname, SITE.website).href;
+const ogUrl = canonical;
+const ogImg = new URL(ogImage ?? SITE.ogImageDefault, SITE.website).href;
+---
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={robots} />
+<meta name="generator" content={`Astro · astro-blog`} />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content={ogType} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={ogUrl} />
+<meta property="og:site_name" content={SITE.title} />
+<meta property="og:image" content={ogImg} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={title} />
+<meta property="og:locale" content={SITE.locale.replace("-", "_")} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImg} />
+<meta name="twitter:image:alt" content={title} />
+{twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}
+
+<link rel="alternate" type="application/rss+xml" title={`${SITE.title} RSS`} href="/rss.xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+{schemas.map((s) => (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(s)} />
+))}

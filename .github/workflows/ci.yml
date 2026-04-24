@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Type-check & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+      - run: bun run build
+      - name: Verify /admin is 404 in prod build
+        run: |
+          if [ -f dist/admin/index.html ]; then
+            BODY=$(cat dist/admin/index.html)
+            if ! echo "$BODY" | grep -q "dev-only"; then
+              echo "::error::/admin/ exists but isn't the dev-only notice"
+              exit 1
+            fi
+          fi
+          if [ -d dist/admin/preview ]; then
+            echo "::error::/admin/preview was generated in prod — should be empty"
+            exit 1
+          fi
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  smoke:
+    name: Smoke test
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - name: Serve & probe
+        run: |
+          bun run preview --host 127.0.0.1 --port 4321 &
+          PREVIEW_PID=$!
+          sleep 3
+          check() {
+            local status
+            status=$(curl -s -o /dev/null -w "%{http_code}" "$1")
+            echo "$1 → $status"
+            if [ "$status" != "$2" ]; then
+              kill $PREVIEW_PID || true
+              exit 1
+            fi
+          }
+          check http://127.0.0.1:4321/ 200
+          check http://127.0.0.1:4321/posts/ 200
+          check http://127.0.0.1:4321/posts/example-post/ 200
+          check http://127.0.0.1:4321/tags/ 200
+          check http://127.0.0.1:4321/about/ 200
+          check http://127.0.0.1:4321/rss.xml 200
+          check http://127.0.0.1:4321/sitemap-index.xml 200
+          kill $PREVIEW_PID || true

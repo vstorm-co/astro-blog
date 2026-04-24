@@ -1,0 +1,329 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import Breadcrumbs from "@/components/layout/Breadcrumbs.astro";
+import Datetime from "@/components/post/Datetime.astro";
+import TagChip from "@/components/post/TagChip.astro";
+import TOC from "@/components/post/TOC.astro";
+import ShareLinks from "@/components/post/ShareLinks.astro";
+import PrevNext from "@/components/post/PrevNext.astro";
+import RelatedPosts from "@/components/post/RelatedPosts.astro";
+import CopyCodeButton from "@/components/islands/CopyCodeButton";
+import { Image } from "astro:assets";
+import type { Post } from "@/lib/posts";
+import { readingTimeMinutes } from "@/lib/posts";
+import { blogPostingSchema, breadcrumbSchema } from "@/lib/schemas";
+import { SITE } from "@/site.config";
+import "@/styles/prose.css";
+import ImageZoom from "@/components/blog/ImageZoom.astro";
+import type { MarkdownHeading } from "astro";
+
+export interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+  prev: Post | null;
+  next: Post | null;
+}
+
+const { post, headings, prev, next } = Astro.props;
+const { data, body } = post;
+const url = new URL(`/posts/${post.id}/`, SITE.website).href;
+const readingMin = readingTimeMinutes(body);
+const hasTOC = headings.filter((h) => h.depth >= 2 && h.depth <= 3).length > 1;
+
+const schemas = [
+  blogPostingSchema({
+    title: data.title,
+    description: data.description,
+    url,
+    author: data.author,
+    datePublished: data.pubDate,
+    dateModified: data.updatedDate,
+    image: data.ogImage,
+  }),
+  breadcrumbSchema([
+    { name: "Home", url: SITE.website },
+    { name: "Blog", url: new URL("/posts/", SITE.website).href },
+    { name: data.title, url },
+  ]),
+];
+
+const editHref =
+  SITE.features.editPost && SITE.editPost.baseUrl
+    ? `${SITE.editPost.baseUrl}src/data/blog/${post.id}.mdx`
+    : null;
+---
+<BaseLayout
+  title={data.title}
+  description={data.description}
+  canonicalURL={data.canonicalURL ?? url}
+  ogImage={data.ogImage}
+  ogType="article"
+  schemas={schemas}
+>
+  <!-- Scroll progress bar -->
+  <div id="scroll-progress" aria-hidden="true"></div>
+
+  <CopyCodeButton client:visible />
+  <ImageZoom />
+  <div class="post-wrap">
+    <div class="post-layout">
+      <!-- Main article column -->
+      <article class="post-article">
+        <Breadcrumbs
+          crumbs={[
+            { label: "Home", href: "/" },
+            { label: "Blog", href: "/posts/" },
+            { label: data.title },
+          ]}
+        />
+
+        <header class="post-header">
+          <div class="post-meta">
+            <Datetime date={data.pubDate} />
+            <span class="dot" aria-hidden>·</span>
+            <span>{readingMin} min read</span>
+            {data.author !== SITE.author && (
+              <>
+                <span class="dot" aria-hidden>·</span>
+                <span>by {data.author}</span>
+              </>
+            )}
+            {data.updatedDate && (
+              <>
+                <span class="dot" aria-hidden>·</span>
+                <span>Updated <Datetime date={data.updatedDate} /></span>
+              </>
+            )}
+          </div>
+          <h1 class="post-title">{data.title}</h1>
+          {data.description && (
+            <p class="post-description">{data.description}</p>
+          )}
+          {data.tags.length > 0 && (
+            <div class="post-tags">
+              {data.tags.map((t) => <TagChip tag={t} size="md" />)}
+            </div>
+          )}
+        </header>
+
+        {(data.cover || data.heroImage) && (
+          <div class="post-cover">
+            {data.cover ? (
+              <Image
+                src={data.cover}
+                alt={data.coverAlt ?? data.title}
+                width={900}
+                height={500}
+                class="post-cover-img"
+                loading="eager"
+                decoding="async"
+              />
+            ) : (
+              <img
+                src={data.heroImage}
+                alt={data.coverAlt ?? data.title}
+                class="post-cover-img"
+                loading="eager"
+                decoding="async"
+              />
+            )}
+          </div>
+        )}
+
+        {hasTOC && (
+          <details class="mobile-toc">
+            <summary>Table of contents</summary>
+            <TOC headings={headings} />
+          </details>
+        )}
+
+        <div class="prose">
+          <slot />
+        </div>
+
+        <footer class="post-footer">
+          <hr class="post-divider" />
+          <div class="post-footer-row">
+            {editHref && (
+              <a href={editHref} class="edit-link" rel="noopener" target="_blank">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden>
+                  <path d="M9 3l2 2-6 6H3v-2l6-6zm0 0l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {SITE.editPost.text}
+              </a>
+            )}
+            <ShareLinks url={url} title={data.title} />
+          </div>
+          <RelatedPosts currentId={post.id} tags={data.tags} />
+          <PrevNext prev={prev} next={next} />
+        </footer>
+      </article>
+
+      <!-- Sidebar TOC — desktop only -->
+      {hasTOC && (
+        <aside class="post-sidebar">
+          <div class="post-sidebar-inner">
+            <TOC headings={headings} />
+          </div>
+        </aside>
+      )}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  #scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: var(--color-accent);
+    z-index: 200;
+    transition: width 0.05s linear;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .post-wrap {
+    max-width: var(--container-wide);
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+  }
+  .post-layout {
+    display: flex;
+    gap: 3.5rem;
+  }
+
+  /* Main article */
+  .post-article {
+    flex: 1;
+    min-width: 0;
+    align-self: flex-start;
+  }
+  .post-header {
+    margin: 2rem 0 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--color-text-tertiary);
+  }
+  .dot { opacity: 0.5; }
+  .post-title {
+    font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    margin: 0;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .post-description {
+    margin: 0;
+    font-size: 1.075rem;
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  /* Cover image */
+  .post-cover {
+    margin: 0 0 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+  .post-cover-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 480px;
+    object-fit: cover;
+  }
+
+  /* Mobile TOC */
+  .mobile-toc {
+    margin: 0 0 2rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    font-size: 0.875rem;
+  }
+  .mobile-toc summary {
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-tertiary);
+    list-style: none;
+    user-select: none;
+  }
+  .mobile-toc summary::-webkit-details-marker { display: none; }
+  .mobile-toc summary::after { content: " ▸"; }
+  .mobile-toc[open] summary::after { content: " ▾"; }
+  .mobile-toc[open] summary { margin-bottom: 0.6rem; }
+
+  /* Sidebar */
+  .post-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    display: none;
+  }
+  .post-sidebar-inner {
+    position: sticky;
+    top: 5rem;
+  }
+  @media (min-width: 900px) {
+    .post-sidebar { display: block; }
+    .mobile-toc { display: none; }
+  }
+
+  /* Footer */
+  .post-footer { margin-top: 3rem; }
+  .post-divider {
+    border: 0;
+    border-top: 1px solid var(--color-border);
+    margin: 0 0 1.5rem;
+  }
+  .post-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
+  .edit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    font-size: 0.825rem;
+    transition: color 0.15s;
+  }
+  .edit-link:hover { color: var(--color-accent); }
+</style>
+
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('scroll-progress');
+    if (!bar) return;
+    function update() {
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>

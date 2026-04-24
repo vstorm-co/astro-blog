@@ -1,0 +1,21 @@
+---
+import { SITE } from "@/site.config";
+
+export interface Props {
+  date: Date;
+  showTime?: boolean;
+  class?: string;
+}
+
+const { date, showTime = false, class: className } = Astro.props;
+
+const formatter = new Intl.DateTimeFormat(SITE.locale, {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  ...(showTime ? { hour: "2-digit", minute: "2-digit", timeZone: SITE.timezone } : {}),
+});
+---
+<time datetime={date.toISOString()} class={className}>
+  {formatter.format(date)}
+</time>

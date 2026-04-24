@@ -1,0 +1,23 @@
+name: Scheduled rebuild
+
+on:
+  schedule:
+    - cron: "0 * * * *" # hourly
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    # Enable by setting the `SCHEDULED_REBUILD` repo variable to "1"
+    # and `DEPLOY_HOOK_URL` repo secret to your host's build hook.
+    if: ${{ vars.SCHEDULED_REBUILD == '1' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deploy hook
+        env:
+          HOOK: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::DEPLOY_HOOK_URL secret is not set"
+            exit 1
+          fi
+          curl -fsS -X POST "$HOOK"

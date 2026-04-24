@@ -1,0 +1,84 @@
+---
+import AdminApp from "@/components/admin/AdminApp";
+const isDev = import.meta.env.DEV;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Admin · Local</title>
+    <link rel="icon" href="/favicon.svg" />
+    <style is:global>
+      html, body { margin: 0; padding: 0; height: 100%; background: #09090b; color: #fafafa; font-family: Inter, system-ui, sans-serif; }
+      #admin-root { height: 100vh; }
+    </style>
+    {isDev && (
+      <script is:inline>
+        // Block Vite/Astro full-page reloads triggered by content file changes.
+        // Must run synchronously before @vite/client connects its WebSocket.
+        (function () {
+          function shouldBlock(raw) {
+            try {
+              var d = JSON.parse(raw);
+              // Block full-reloads. Updates are handled by our React app via the API.
+              if (d.type === 'full-reload') return true;
+              // Block hot-updates for content/data files — we manage those manually.
+              if (d.type === 'update' && Array.isArray(d.updates)) {
+                d.updates = d.updates.filter(function (u) {
+                  var p = u.path || '';
+                  return !p.includes('/src/data/') && !p.includes('astro:content');
+                });
+                return d.updates.length === 0;
+              }
+            } catch (_) {}
+            return false;
+          }
+
+          // Wrap addEventListener on WebSocket.prototype so any WS Vite creates gets filtered.
+          var proto = WebSocket.prototype;
+          var origAdd = proto.addEventListener;
+          proto.addEventListener = function (type, fn, opts) {
+            if (type === 'message' && typeof fn === 'function') {
+              var wrapped = function (e) {
+                if (shouldBlock(e.data)) return;
+                fn.call(this, e);
+              };
+              return origAdd.call(this, type, wrapped, opts);
+            }
+            return origAdd.call(this, type, fn, opts);
+          };
+
+          // Also cover ws.onmessage = handler pattern.
+          var desc = Object.getOwnPropertyDescriptor(proto, 'onmessage');
+          if (desc && desc.set) {
+            Object.defineProperty(proto, 'onmessage', {
+              configurable: true,
+              get: desc.get,
+              set: function (fn) {
+                if (typeof fn !== 'function') { desc.set.call(this, fn); return; }
+                desc.set.call(this, function (e) {
+                  if (shouldBlock(e.data)) return;
+                  fn.call(this, e);
+                });
+              },
+            });
+          }
+        })();
+      </script>
+    )}
+  </head>
+  <body>
+    {isDev ? (
+      <div id="admin-root">
+        <AdminApp client:only="react" />
+      </div>
+    ) : (
+      <div style="padding:2rem;font-family:system-ui;max-width:40rem;margin:4rem auto">
+        <h1 style="font-size:1.5rem;margin-bottom:1rem">Admin panel is dev-only</h1>
+        <p style="color:#a1a1aa">This route is only available when running <code>bun run dev</code> locally.</p>
+      </div>
+    )}
+  </body>
+</html>
