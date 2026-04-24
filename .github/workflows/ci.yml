@@ -68,7 +68,7 @@ jobs:
           }
           check http://127.0.0.1:4321/ 200
           check http://127.0.0.1:4321/posts/ 200
-          check http://127.0.0.1:4321/posts/example-post/ 200
+          check http://127.0.0.1:4321/posts/getting-started-with-astro-blog/ 200
           check http://127.0.0.1:4321/tags/ 200
           check http://127.0.0.1:4321/about/ 200
           check http://127.0.0.1:4321/rss.xml 200

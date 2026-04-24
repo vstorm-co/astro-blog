@@ -1,4 +1,5 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection } from "astro:content";
+import { z } from "zod";
 import { glob } from "astro/loaders";
 import { SITE } from "./site.config";
 
@@ -21,7 +22,7 @@ const blog = defineCollection({
       draft: z.boolean().default(false),
       featured: z.boolean().default(false),
       ogImage: z.string().optional(),
-      canonicalURL: z.string().url().optional(),
+      canonicalURL: z.url().optional(),
     }),
 });
 

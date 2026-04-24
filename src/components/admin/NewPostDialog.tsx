@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Collection } from "./api";
 
 export interface NewPostDialogProps {
@@ -28,10 +28,15 @@ export function NewPostDialog({ onCancel, onCreate }: NewPostDialogProps) {
   const [slug, setSlug] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    titleRef.current?.focus();
+  }, []);
 
   const autoSlug = slug || slugify(title);
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!title || !autoSlug) return;
     setBusy(true);
@@ -46,21 +51,28 @@ export function NewPostDialog({ onCancel, onCreate }: NewPostDialogProps) {
   };
 
   return (
-    <div className="ap-modal-backdrop" onClick={onCancel}>
-      <form className="ap-modal" onClick={(e) => e.stopPropagation()} onSubmit={submit}>
+    <div
+      className="ap-modal-backdrop"
+      role="presentation"
+      onClick={onCancel}
+      onKeyDown={(e) => e.key === "Escape" && onCancel()}
+    >
+      <form className="ap-modal" onSubmit={submit}>
         <h2>New entry</h2>
         <div className="ap-form-row">
-          <label>Title</label>
+          <label htmlFor="np-title">Title</label>
           <input
+            id="np-title"
+            ref={titleRef}
             className="ap-input"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            autoFocus
           />
         </div>
         <div className="ap-form-row">
-          <label>Slug</label>
+          <label htmlFor="np-slug">Slug</label>
           <input
+            id="np-slug"
             className="ap-input"
             value={slug}
             placeholder={slugify(title) || "my-post"}
@@ -68,8 +80,9 @@ export function NewPostDialog({ onCancel, onCreate }: NewPostDialogProps) {
           />
         </div>
         <div className="ap-form-row">
-          <label>Description</label>
+          <label htmlFor="np-desc">Description</label>
           <textarea
+            id="np-desc"
             className="ap-input"
             rows={3}
             value={description}

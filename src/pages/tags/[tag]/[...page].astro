@@ -29,17 +29,24 @@ export const getStaticPaths: GetStaticPaths = async () => {
 const { tagLabel, postsData } = Astro.props as {
   tagLabel: string;
   postsData: Array<{
-    slug: string; title: string; description: string; pubDate: string;
-    author: string; tags: string[]; heroImage: string | null; readingMin: number;
+    slug: string;
+    title: string;
+    description: string;
+    pubDate: string;
+    author: string;
+    tags: string[];
+    heroImage: string | null;
+    readingMin: number;
   }>;
 };
-const { tag } = Astro.params;
+void Astro.params.tag;
 ---
+
 <BaseLayout
   title={`#${tagLabel} · ${SITE.title}`}
   description={`Posts tagged ${tagLabel} on ${SITE.title}`}
 >
-  <div class="container listing">
+  <div class="listing container">
     <Breadcrumbs
       crumbs={[
         { label: "Home", href: "/" },
@@ -51,8 +58,19 @@ const { tag } = Astro.params;
       <p class="eyebrow">Tag</p>
       <h1 class="listing-title">#{tagLabel}</h1>
       <div class="listing-search-wrap">
-        <svg class="listing-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        <svg
+          class="listing-search-icon"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
         <input
           id="posts-search"
@@ -70,20 +88,20 @@ const { tag } = Astro.params;
       <div class="listing-view-toggle" role="group" aria-label="View mode">
         <button id="btn-grid" class="view-btn" aria-pressed="true" title="Grid view">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
-            <rect x="0" y="0" width="6" height="6" rx="1"/>
-            <rect x="9" y="0" width="6" height="6" rx="1"/>
-            <rect x="0" y="9" width="6" height="6" rx="1"/>
-            <rect x="9" y="9" width="6" height="6" rx="1"/>
+            <rect x="0" y="0" width="6" height="6" rx="1"></rect>
+            <rect x="9" y="0" width="6" height="6" rx="1"></rect>
+            <rect x="0" y="9" width="6" height="6" rx="1"></rect>
+            <rect x="9" y="9" width="6" height="6" rx="1"></rect>
           </svg>
         </button>
         <button id="btn-list" class="view-btn" aria-pressed="false" title="List view">
           <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
-            <rect x="4" y="1" width="11" height="2" rx="1"/>
-            <rect x="0" y="1" width="2.5" height="2" rx="0.5"/>
-            <rect x="4" y="6.5" width="11" height="2" rx="1"/>
-            <rect x="0" y="6.5" width="2.5" height="2" rx="0.5"/>
-            <rect x="4" y="12" width="11" height="2" rx="1"/>
-            <rect x="0" y="12" width="2.5" height="2" rx="0.5"/>
+            <rect x="4" y="1" width="11" height="2" rx="1"></rect>
+            <rect x="0" y="1" width="2.5" height="2" rx="0.5"></rect>
+            <rect x="4" y="6.5" width="11" height="2" rx="1"></rect>
+            <rect x="0" y="6.5" width="2.5" height="2" rx="0.5"></rect>
+            <rect x="4" y="12" width="11" height="2" rx="1"></rect>
+            <rect x="0" y="12" width="2.5" height="2" rx="0.5"></rect>
           </svg>
         </button>
       </div>
@@ -94,16 +112,22 @@ const { tag } = Astro.params;
 
     <noscript>
       <ul class="noscript-list">
-        {postsData.map((p) => (
-          <li><a href={`/posts/${p.slug}/`}>{p.title}</a></li>
-        ))}
+        {
+          postsData.map((p) => (
+            <li>
+              <a href={`/posts/${p.slug}/`}>{p.title}</a>
+            </li>
+          ))
+        }
       </ul>
     </noscript>
   </div>
 </BaseLayout>
 
 <style is:global>
-  .listing { padding: 3rem 1.5rem 5rem; }
+  .listing {
+    padding: 3rem 1.5rem 5rem;
+  }
   .listing-header {
     margin-bottom: 1.5rem;
     display: flex;
@@ -145,8 +169,12 @@ const { tag } = Astro.params;
     outline: none;
     transition: border-color 0.15s;
   }
-  .listing-search:focus { border-color: var(--color-accent); }
-  .listing-search::placeholder { color: var(--color-text-tertiary); }
+  .listing-search:focus {
+    border-color: var(--color-accent);
+  }
+  .listing-search::placeholder {
+    color: var(--color-text-tertiary);
+  }
   .listing-controls {
     display: flex;
     align-items: center;
@@ -154,7 +182,10 @@ const { tag } = Astro.params;
     margin-bottom: 1.25rem;
     min-height: 2rem;
   }
-  .listing-count { font-size: 0.82rem; color: var(--color-text-tertiary); }
+  .listing-count {
+    font-size: 0.82rem;
+    color: var(--color-text-tertiary);
+  }
   .listing-view-toggle {
     display: flex;
     gap: 2px;
@@ -176,8 +207,14 @@ const { tag } = Astro.params;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .view-btn:hover { color: var(--color-text); background: var(--color-surface-hover); }
-  .view-btn.active { background: var(--color-accent); color: #fff; }
+  .view-btn:hover {
+    color: var(--color-text);
+    background: var(--color-surface-hover);
+  }
+  .view-btn.active {
+    background: var(--color-accent);
+    color: #fff;
+  }
   .lc-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -194,8 +231,13 @@ const { tag } = Astro.params;
     background: var(--color-surface);
     transition: all 0.15s;
   }
-  .lc-card:hover { border-color: var(--color-border-hover); transform: translateY(-2px); }
-  .lc-card:hover .lc-title { color: var(--color-accent); }
+  .lc-card:hover {
+    border-color: var(--color-border-hover);
+    transform: translateY(-2px);
+  }
+  .lc-card:hover .lc-title {
+    color: var(--color-accent);
+  }
   .lc-cover {
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -209,14 +251,20 @@ const { tag } = Astro.params;
     display: block;
     transition: transform 0.3s;
   }
-  .lc-card:hover .lc-cover-img { transform: scale(1.04); }
+  .lc-card:hover .lc-cover-img {
+    transform: scale(1.04);
+  }
   .lc-placeholder {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--color-surface-hover) 0%, color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-hover)) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-surface-hover) 0%,
+      color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-hover)) 100%
+    );
   }
   .lc-letter {
     font-size: 3rem;
@@ -232,8 +280,16 @@ const { tag } = Astro.params;
     padding: 1rem;
     flex: 1;
   }
-  .lc-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-  .lc-tag { font-size: 0.7rem; color: var(--color-accent); font-weight: 500; }
+  .lc-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .lc-tag {
+    font-size: 0.7rem;
+    color: var(--color-accent);
+    font-weight: 500;
+  }
   .lc-title {
     font-size: 1rem;
     font-weight: 600;
@@ -268,7 +324,9 @@ const { tag } = Astro.params;
     padding-top: 0.35rem;
     flex-wrap: wrap;
   }
-  .lc-list { border-top: 1px solid var(--color-border); }
+  .lc-list {
+    border-top: 1px solid var(--color-border);
+  }
   .lc-row {
     display: grid;
     grid-template-columns: 7.5rem 1fr auto;
@@ -280,168 +338,348 @@ const { tag } = Astro.params;
     color: inherit;
     transition: color 0.15s;
   }
-  .lc-row:hover .lc-row-title { color: var(--color-accent); }
-  .lc-row-date { font-size: 0.82rem; color: var(--color-text-tertiary); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .lc-row-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+  .lc-row:hover .lc-row-title {
+    color: var(--color-accent);
+  }
+  .lc-row-date {
+    font-size: 0.82rem;
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .lc-row-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
   .lc-row-title {
-    font-size: 1.0625rem; font-weight: 500; letter-spacing: -0.015em;
-    line-height: 1.35; color: var(--color-text); transition: color 0.15s;
-    display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+    color: var(--color-text);
+    transition: color 0.15s;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .lc-row-desc {
-    font-size: 0.88rem; color: var(--color-text-secondary); line-height: 1.5;
-    display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 0.88rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .lc-row-meta {
-    color: var(--color-text-tertiary); font-size: 0.76rem; white-space: nowrap;
-    display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem;
+    color: var(--color-text-tertiary);
+    font-size: 0.76rem;
+    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
   }
   @media (max-width: 640px) {
-    .lc-row { grid-template-columns: 1fr; gap: 0.25rem; }
-    .lc-row-meta { display: none; }
-    .lc-row-date { font-size: 0.78rem; }
+    .lc-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+    .lc-row-meta {
+      display: none;
+    }
+    .lc-row-date {
+      font-size: 0.78rem;
+    }
   }
-  .lc-empty { text-align: center; color: var(--color-text-tertiary); padding: 3rem 0; font-size: 0.9rem; }
-  .pg-wrap { display: flex; align-items: center; justify-content: center; gap: 0.3rem; margin-top: 2.5rem; flex-wrap: wrap; }
+  .lc-empty {
+    text-align: center;
+    color: var(--color-text-tertiary);
+    padding: 3rem 0;
+    font-size: 0.9rem;
+  }
+  .pg-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
   .pg-btn {
-    min-width: 2rem; height: 2rem; padding: 0 0.5rem;
-    border: 1px solid var(--color-border); border-radius: 6px;
-    background: var(--color-surface); color: var(--color-text-secondary);
-    font-size: 0.82rem; cursor: pointer; font-family: inherit; transition: all 0.15s;
-    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
-  .pg-btn:hover { border-color: var(--color-border-hover); color: var(--color-text); }
-  .pg-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: #fff; font-weight: 600; }
-  .pg-ellipsis { color: var(--color-text-tertiary); font-size: 0.82rem; padding: 0 0.2rem; }
-  .noscript-list { padding: 2rem 0; }
-  .noscript-list a { color: var(--color-accent); }
+  .pg-btn:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-text);
+  }
+  .pg-btn.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .pg-ellipsis {
+    color: var(--color-text-tertiary);
+    font-size: 0.82rem;
+    padding: 0 0.2rem;
+  }
+  .noscript-list {
+    padding: 2rem 0;
+  }
+  .noscript-list a {
+    color: var(--color-accent);
+  }
 </style>
 
-<script define:vars={{ postsData }}>
-(function () {
-  var POSTS_PER_PAGE = 20;
-  var allPosts = postsData;
-  var filteredPosts = allPosts;
+<script is:inline define:vars={{ postsData }}>
+  (function () {
+    const POSTS_PER_PAGE = 20;
+    const allPosts = postsData;
+    let filteredPosts = allPosts;
 
-  var state = {
-    query: '',
-    page: 1,
-    view: (function() { try { return localStorage.getItem('blog-view') || 'grid'; } catch(e) { return 'grid'; } })(),
-  };
+    const state = {
+      query: "",
+      page: 1,
+      view: (function () {
+        try {
+          return localStorage.getItem("blog-view") || "grid";
+        } catch {
+          return "grid";
+        }
+      })(),
+    };
 
-  var container = document.getElementById('posts-container');
-  var paginationEl = document.getElementById('posts-pagination');
-  var countEl = document.getElementById('posts-count');
-  var searchInput = document.getElementById('posts-search');
-  var btnGrid = document.getElementById('btn-grid');
-  var btnList = document.getElementById('btn-list');
+    const container = document.getElementById("posts-container");
+    const paginationEl = document.getElementById("posts-pagination");
+    const countEl = document.getElementById("posts-count");
+    const searchInput = document.getElementById("posts-search");
+    const btnGrid = document.getElementById("btn-grid");
+    const btnList = document.getElementById("btn-list");
 
-  function esc(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function fmtDate(iso) {
-    try { return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' }); }
-    catch(e) { return iso; }
-  }
-
-  function gridCard(p) {
-    var img = p.heroImage
-      ? '<img src="' + esc(p.heroImage) + '" alt="' + esc(p.title) + '" class="lc-cover-img" loading="lazy" decoding="async" />'
-      : '<div class="lc-placeholder"><span class="lc-letter">' + esc((p.title||'?').charAt(0)) + '</span></div>';
-    var tags = (p.tags||[]).slice(0,2).map(function(t){return '<span class="lc-tag">#'+esc(t)+'</span>';}).join('');
-    return '<a class="lc-card" href="/posts/'+esc(p.slug)+'/">'
-      +'<div class="lc-cover">'+img+'</div>'
-      +'<div class="lc-body">'
-      +(tags?'<div class="lc-tags">'+tags+'</div>':'')
-      +'<h2 class="lc-title">'+esc(p.title)+'</h2>'
-      +'<p class="lc-desc">'+esc(p.description)+'</p>'
-      +'<div class="lc-meta"><span>'+fmtDate(p.pubDate)+'</span><span aria-hidden="true">·</span><span>'+esc(p.author)+'</span><span aria-hidden="true">·</span><span>'+p.readingMin+' min</span></div>'
-      +'</div></a>';
-  }
-
-  function listRow(p) {
-    return '<a class="lc-row" href="/posts/'+esc(p.slug)+'/">'
-      +'<span class="lc-row-date">'+fmtDate(p.pubDate)+'</span>'
-      +'<span class="lc-row-body"><span class="lc-row-title">'+esc(p.title)+'</span><span class="lc-row-desc">'+esc(p.description)+'</span></span>'
-      +'<span class="lc-row-meta"><span>'+esc(p.author)+'</span><span>'+p.readingMin+' min</span></span>'
-      +'</a>';
-  }
-
-  function renderPagination(cur, total) {
-    if (total <= 1) { paginationEl.innerHTML = ''; return; }
-    var parts = [];
-    if (cur > 1) parts.push('<button class="pg-btn" data-page="'+(cur-1)+'" aria-label="Previous">←</button>');
-    var lo = Math.max(1,cur-2), hi = Math.min(total,cur+2);
-    if (lo > 1) { parts.push('<button class="pg-btn" data-page="1">1</button>'); if (lo > 2) parts.push('<span class="pg-ellipsis">…</span>'); }
-    for (var i = lo; i <= hi; i++) {
-      parts.push('<button class="pg-btn'+(i===cur?' active':'')+'" data-page="'+i+'"'+(i===cur?' aria-current="page"':'')+'>'+i+'</button>');
+    function esc(s) {
+      return String(s || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
-    if (hi < total) { if (hi < total-1) parts.push('<span class="pg-ellipsis">…</span>'); parts.push('<button class="pg-btn" data-page="'+total+'">'+total+'</button>'); }
-    if (cur < total) parts.push('<button class="pg-btn" data-page="'+(cur+1)+'" aria-label="Next">→</button>');
-    paginationEl.innerHTML = '<div class="pg-wrap">'+parts.join('')+'</div>';
-    paginationEl.querySelectorAll('.pg-btn[data-page]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        state.page = parseInt(btn.getAttribute('data-page'),10);
-        render();
-        window.scrollTo({top:0,behavior:'smooth'});
+
+    function fmtDate(iso) {
+      try {
+        return new Date(iso + "T00:00:00").toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      } catch {
+        return iso;
+      }
+    }
+
+    function gridCard(p) {
+      const img = p.heroImage
+        ? '<img src="' +
+          esc(p.heroImage) +
+          '" alt="' +
+          esc(p.title) +
+          '" class="lc-cover-img" loading="lazy" decoding="async" />'
+        : '<div class="lc-placeholder"><span class="lc-letter">' +
+          esc((p.title || "?").charAt(0)) +
+          "</span></div>";
+      const tags = (p.tags || [])
+        .slice(0, 2)
+        .map(function (t) {
+          return '<span class="lc-tag">#' + esc(t) + "</span>";
+        })
+        .join("");
+      return (
+        '<a class="lc-card" href="/posts/' +
+        esc(p.slug) +
+        '/">' +
+        '<div class="lc-cover">' +
+        img +
+        "</div>" +
+        '<div class="lc-body">' +
+        (tags ? '<div class="lc-tags">' + tags + "</div>" : "") +
+        '<h2 class="lc-title">' +
+        esc(p.title) +
+        "</h2>" +
+        '<p class="lc-desc">' +
+        esc(p.description) +
+        "</p>" +
+        '<div class="lc-meta"><span>' +
+        fmtDate(p.pubDate) +
+        '</span><span aria-hidden="true">·</span><span>' +
+        esc(p.author) +
+        '</span><span aria-hidden="true">·</span><span>' +
+        p.readingMin +
+        " min</span></div>" +
+        "</div></a>"
+      );
+    }
+
+    function listRow(p) {
+      return (
+        '<a class="lc-row" href="/posts/' +
+        esc(p.slug) +
+        '/">' +
+        '<span class="lc-row-date">' +
+        fmtDate(p.pubDate) +
+        "</span>" +
+        '<span class="lc-row-body"><span class="lc-row-title">' +
+        esc(p.title) +
+        '</span><span class="lc-row-desc">' +
+        esc(p.description) +
+        "</span></span>" +
+        '<span class="lc-row-meta"><span>' +
+        esc(p.author) +
+        "</span><span>" +
+        p.readingMin +
+        " min</span></span>" +
+        "</a>"
+      );
+    }
+
+    function renderPagination(cur, total) {
+      if (total <= 1) {
+        paginationEl.innerHTML = "";
+        return;
+      }
+      const parts = [];
+      if (cur > 1)
+        parts.push(
+          '<button class="pg-btn" data-page="' + (cur - 1) + '" aria-label="Previous">←</button>',
+        );
+      const lo = Math.max(1, cur - 2),
+        hi = Math.min(total, cur + 2);
+      if (lo > 1) {
+        parts.push('<button class="pg-btn" data-page="1">1</button>');
+        if (lo > 2) parts.push('<span class="pg-ellipsis">…</span>');
+      }
+      for (let i = lo; i <= hi; i++) {
+        parts.push(
+          '<button class="pg-btn' +
+            (i === cur ? " active" : "") +
+            '" data-page="' +
+            i +
+            '"' +
+            (i === cur ? ' aria-current="page"' : "") +
+            ">" +
+            i +
+            "</button>",
+        );
+      }
+      if (hi < total) {
+        if (hi < total - 1) parts.push('<span class="pg-ellipsis">…</span>');
+        parts.push('<button class="pg-btn" data-page="' + total + '">' + total + "</button>");
+      }
+      if (cur < total)
+        parts.push(
+          '<button class="pg-btn" data-page="' + (cur + 1) + '" aria-label="Next">→</button>',
+        );
+      paginationEl.innerHTML = '<div class="pg-wrap">' + parts.join("") + "</div>";
+      paginationEl.querySelectorAll(".pg-btn[data-page]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          state.page = parseInt(btn.getAttribute("data-page"), 10);
+          render();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
       });
-    });
-  }
-
-  function render() {
-    var start = (state.page-1)*POSTS_PER_PAGE;
-    var slice = filteredPosts.slice(start, start+POSTS_PER_PAGE);
-    var total = Math.ceil(filteredPosts.length/POSTS_PER_PAGE);
-    if (filteredPosts.length === 0) {
-      container.innerHTML = '<div class="lc-empty">No posts match your search.</div>';
-      paginationEl.innerHTML = '';
-      countEl.textContent = '0 results';
-      return;
     }
-    var html = state.view === 'grid'
-      ? '<div class="lc-grid">'+slice.map(gridCard).join('')+'</div>'
-      : '<div class="lc-list">'+slice.map(listRow).join('')+'</div>';
-    container.innerHTML = html;
-    renderPagination(state.page, total);
-    countEl.textContent = state.query
-      ? filteredPosts.length+' result'+(filteredPosts.length!==1?'s':'')+' for "'+state.query+'"'
-      : filteredPosts.length+' post'+(filteredPosts.length!==1?'s':'');
-    btnGrid.setAttribute('aria-pressed', state.view==='grid'?'true':'false');
-    btnGrid.classList.toggle('active', state.view==='grid');
-    btnList.setAttribute('aria-pressed', state.view==='list'?'true':'false');
-    btnList.classList.toggle('active', state.view==='list');
-  }
 
-  function applySearch() {
-    var q = state.query.toLowerCase().trim();
-    filteredPosts = q ? allPosts.filter(function(p) {
-      return p.title.toLowerCase().includes(q)
-        || p.description.toLowerCase().includes(q)
-        || p.author.toLowerCase().includes(q)
-        || (p.tags||[]).some(function(t){return t.toLowerCase().includes(q);});
-    }) : allPosts;
-    state.page = 1;
+    function render() {
+      const start = (state.page - 1) * POSTS_PER_PAGE;
+      const slice = filteredPosts.slice(start, start + POSTS_PER_PAGE);
+      const total = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+      if (filteredPosts.length === 0) {
+        container.innerHTML = '<div class="lc-empty">No posts match your search.</div>';
+        paginationEl.innerHTML = "";
+        countEl.textContent = "0 results";
+        return;
+      }
+      const html =
+        state.view === "grid"
+          ? '<div class="lc-grid">' + slice.map(gridCard).join("") + "</div>"
+          : '<div class="lc-list">' + slice.map(listRow).join("") + "</div>";
+      container.innerHTML = html;
+      renderPagination(state.page, total);
+      countEl.textContent = state.query
+        ? filteredPosts.length +
+          " result" +
+          (filteredPosts.length !== 1 ? "s" : "") +
+          ' for "' +
+          state.query +
+          '"'
+        : filteredPosts.length + " post" + (filteredPosts.length !== 1 ? "s" : "");
+      btnGrid.setAttribute("aria-pressed", state.view === "grid" ? "true" : "false");
+      btnGrid.classList.toggle("active", state.view === "grid");
+      btnList.setAttribute("aria-pressed", state.view === "list" ? "true" : "false");
+      btnList.classList.toggle("active", state.view === "list");
+    }
+
+    function applySearch() {
+      const q = state.query.toLowerCase().trim();
+      filteredPosts = q
+        ? allPosts.filter(function (p) {
+            return (
+              p.title.toLowerCase().includes(q) ||
+              p.description.toLowerCase().includes(q) ||
+              p.author.toLowerCase().includes(q) ||
+              (p.tags || []).some(function (t) {
+                return t.toLowerCase().includes(q);
+              })
+            );
+          })
+        : allPosts;
+      state.page = 1;
+      render();
+    }
+
     render();
-  }
 
-  render();
+    let debounce;
+    searchInput.addEventListener("input", function () {
+      clearTimeout(debounce);
+      const v = searchInput.value;
+      debounce = setTimeout(function () {
+        state.query = v;
+        applySearch();
+      }, 180);
+    });
 
-  var debounce;
-  searchInput.addEventListener('input', function() {
-    clearTimeout(debounce);
-    var v = searchInput.value;
-    debounce = setTimeout(function(){ state.query=v; applySearch(); }, 180);
-  });
+    function setView(v) {
+      if (state.view === v) return;
+      state.view = v;
+      try {
+        localStorage.setItem("blog-view", v);
+      } catch {
+        /* storage unavailable */
+      }
+      render();
+    }
 
-  function setView(v) {
-    if (state.view === v) return;
-    state.view = v;
-    try { localStorage.setItem('blog-view', v); } catch(e) {}
-    render();
-  }
-
-  btnGrid.addEventListener('click', function(){ setView('grid'); });
-  btnList.addEventListener('click', function(){ setView('list'); });
-})();
+    btnGrid.addEventListener("click", function () {
+      setView("grid");
+    });
+    btnList.addEventListener("click", function () {
+      setView("list");
+    });
+  })();
 </script>

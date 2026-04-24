@@ -13,10 +13,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 const { post } = Astro.props as { post: Post };
-const { Content, headings } = await render(post);
+const { Content } = await render(post);
 const { data } = post;
 ---
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -95,9 +96,11 @@ const { data } = post;
     <script is:inline>
       // Inherit theme from admin parent (avoids FOUC)
       try {
-        var t = window.parent?.document?.documentElement?.getAttribute?.('data-theme');
-        if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
-      } catch (_) {}
+        const t = window.parent?.document?.documentElement?.getAttribute?.("data-theme");
+        if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+      } catch {
+        /* cross-origin read — ignore */
+      }
     </script>
   </head>
   <body>
@@ -107,16 +110,22 @@ const { data } = post;
         {data.draft && <div class="preview-draft">● Draft</div>}
         <h1 class="preview-title">{data.title}</h1>
         {data.description && <p class="preview-desc">{data.description}</p>}
-        {data.tags?.length > 0 && (
-          <div class="preview-tags">
-            {data.tags.map((t) => <span class="preview-tag">{t}</span>)}
-          </div>
-        )}
-        {data.heroImage && (
-          <div class="preview-cover">
-            <img src={data.heroImage} alt={data.coverAlt ?? data.title} />
-          </div>
-        )}
+        {
+          data.tags?.length > 0 && (
+            <div class="preview-tags">
+              {data.tags.map((t) => (
+                <span class="preview-tag">{t}</span>
+              ))}
+            </div>
+          )
+        }
+        {
+          data.heroImage && (
+            <div class="preview-cover">
+              <img src={data.heroImage} alt={data.coverAlt ?? data.title} />
+            </div>
+          )
+        }
       </div>
       <article class="prose">
         <Content />

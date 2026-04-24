@@ -13,25 +13,30 @@ function splitDiff(a: string, b: string) {
   return { aLines, bLines };
 }
 const { aLines, bLines } = splitDiff(before, after);
-const _ = lang; // reserved for future Shiki integration
+void lang; // reserved for future Shiki integration
 ---
+
 {/* @mdx-label Diff */}
 {/* @mdx-description Inline before/after code diff. For simple two-version comparisons. */}
-{/* @mdx-snippet
+{
+  /* @mdx-snippet
 <Diff
   lang="ts"
   title="before & after"
   before={`function greet(name) {\n  return "Hello " + name\n}`}
   after={`function greet(name: string): string {\n  return \`Hello \${name}\`\n}`}
 />
-*/}
-{/* @mdx-preview
+*/
+}
+{
+  /* @mdx-preview
 <div style="font-family:monospace;font-size:12px;background:#09090b;border:1px solid #27272a;border-radius:8px;overflow:hidden">
   <div style="padding:4px 12px;background:rgba(239,68,68,.08);color:#f87171;border-left:3px solid #ef4444">- const old = "before"</div>
   <div style="padding:4px 12px;background:rgba(34,197,94,.08);color:#4ade80;border-left:3px solid #22c55e">+ const new = "after"</div>
   <div style="padding:4px 12px;color:#71717a;border-left:3px solid transparent">  // unchanged line</div>
 </div>
-*/}
+*/
+}
 
 <div class="diff">
   {title && <p class="diff-title">{title}</p>}
@@ -84,11 +89,24 @@ const _ = lang; // reserved for future Shiki integration
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
-  .diff-pane pre { margin: 0; }
-  .diff-before .diff-line { color: #fb7185; background: rgba(244, 63, 94, 0.05); }
-  .diff-after .diff-line { color: #34d399; background: rgba(16, 185, 129, 0.05); }
+  .diff-pane pre {
+    margin: 0;
+  }
+  .diff-before .diff-line {
+    color: #fb7185;
+    background: rgba(244, 63, 94, 0.05);
+  }
+  .diff-after .diff-line {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.05);
+  }
   @media (max-width: 640px) {
-    .diff-panes { grid-template-columns: 1fr; }
-    .diff-pane + .diff-pane { border-left: 0; border-top: 1px solid var(--color-border); }
+    .diff-panes {
+      grid-template-columns: 1fr;
+    }
+    .diff-pane + .diff-pane {
+      border-left: 0;
+      border-top: 1px solid var(--color-border);
+    }
   }
 </style>

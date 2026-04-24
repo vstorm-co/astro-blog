@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function CopyCodeButton() {
-  const [copied, setCopied] = useState<string | null>(null);
-
   useEffect(() => {
     const blocks = document.querySelectorAll("pre");
 
