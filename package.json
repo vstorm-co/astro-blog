@@ -26,8 +26,8 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.0",
-    "@astrojs/react": "^4.2.0",
+    "@astrojs/mdx": "^5.0.4",
+    "@astrojs/react": "^5.0.4",
     "@astrojs/rss": "^4.0.14",
     "@astrojs/sitemap": "^3.7.0",
     "@codemirror/lang-markdown": "^6.5.0",
@@ -37,7 +37,7 @@
     "@codemirror/view": "^6.41.0",
     "@tailwindcss/vite": "^4.0.0",
     "@uiw/react-codemirror": "^4.25.0",
-    "astro": "^5.4.0",
+    "astro": "^6.1.9",
     "astro-expressive-code": "^0.41.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.469.0",
